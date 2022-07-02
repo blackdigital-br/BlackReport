@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.2.32602.215
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlackDigital.Report", "BlackDigital.Report\BlackDigital.Report.csproj", "{29D2B22C-10FE-4A5A-818B-ED143B5F93B7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlackDigital.Report.Example", "BlackDigital.Report.Example\BlackDigital.Report.Example.csproj", "{2D569F9A-A69B-4BEB-ACDB-80552C074F4F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{29D2B22C-10FE-4A5A-818B-ED143B5F93B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{29D2B22C-10FE-4A5A-818B-ED143B5F93B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{29D2B22C-10FE-4A5A-818B-ED143B5F93B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{29D2B22C-10FE-4A5A-818B-ED143B5F93B7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2D569F9A-A69B-4BEB-ACDB-80552C074F4F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2D569F9A-A69B-4BEB-ACDB-80552C074F4F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2D569F9A-A69B-4BEB-ACDB-80552C074F4F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2D569F9A-A69B-4BEB-ACDB-80552C074F4F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2EC1DE57-E31F-492A-9C07-9D7DDBD5C78F}
+	EndGlobalSection
+EndGlobal
