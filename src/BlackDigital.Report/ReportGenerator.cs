@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace BlackDigital.Report
 {
-    public static class Report
+    public static class ReportGenerator
     {
-        public static SpreadsheetArguments Spreadsheet() => new();
+        public static SpreadsheetBuilder Spreadsheet() => new();
     }
 }
