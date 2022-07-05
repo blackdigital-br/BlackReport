@@ -16,7 +16,17 @@ Currently it is only generating reports in spreadsheets.
 
 ## Installing
 
-_pending_
+* Package Manager
+
+```
+Install-Package BlackDigital.Report
+```
+
+* .NET CLI
+
+```
+dotnet add package BlackDigital.Report
+```
 
 ## Coding
 
@@ -63,7 +73,7 @@ _pending_
                    .BuildAsync(@"test.xlsx");
 ```
 
-![Example](https://github.com/blackdigital-br/BlackReport/blob/main/docs/images/ClassExample.png?raw=true)
+![Example](https://raw.githubusercontent.com/blackdigital-br/BlackReport/main/docs/images/ClassExample.png)
 
 ### From List
 
@@ -102,7 +112,7 @@ _pending_
                    .BuildAsync(@"test.xlsx");
 ```
 
-![Example](https://github.com/blackdigital-br/BlackReport/blob/main/docs/images/ListExample.png?raw=true)
+![Example](https://raw.githubusercontent.com/blackdigital-br/BlackReport/main/docs/images/ListExample.png)
 
 ### Others Examples
 
@@ -138,6 +148,10 @@ _pending_
     
 ```
 
+### Example
+
+https://github.com/blackdigital-br/BlackReport/tree/main/src/BlackDigital.Report.Example
+
 ## Roadmap
 
     ☑️ Excel Tables. (0.1.0.0)
@@ -145,7 +159,10 @@ _pending_
     ◼️ Use DisplayAttribute to get name of columns and properties that should be generated.
     ◼️ Excel Shared String.
     ◼️ Cells with formulas.
-    ◼️ Cell value set event.
+    ◼️ Cell value event.
+    ◼️ Tables footers.
+    ◼️ Unit test.
+    ◼️ Multiple tables in the same worksheet.
     ◼️ Olders .net versions.
     ◼️ Others types (Word, csv...).
     ◼️ Your suggestion.
