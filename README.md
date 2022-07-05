@@ -6,12 +6,12 @@ Currently it is only generating reports in spreadsheets.
 
 **Alpha version, can be changed at any time without notice.**
 
-* Installing
-* Coding
-    * From class list
-    * From List
-    * Others Examples
-* Roadmap
+* [Installing](#installing)
+* [Coding](#coding)
+    * [From class list](#from-class-list)
+    * [From List](#from-list)
+    * [Others Examples](#others-examples)
+* [Roadmap](#roadmap)
 
 
 ## Installing
@@ -63,6 +63,8 @@ _pending_
                    .BuildAsync(@"test.xlsx");
 ```
 
+![Example](https://github.com/blackdigital-br/BlackReport/blob/main/docs/images/ClassExample.png?raw=true)
+
 ### From List
 
 1. Create object in two-dimensional array:
@@ -100,7 +102,9 @@ _pending_
                    .BuildAsync(@"test.xlsx");
 ```
 
-### Others Examples:
+![Example](https://github.com/blackdigital-br/BlackReport/blob/main/docs/images/ListExample.png?raw=true)
+
+### Others Examples
 
 #### Add single value:
 
