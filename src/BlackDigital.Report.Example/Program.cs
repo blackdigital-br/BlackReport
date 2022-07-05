@@ -5,7 +5,6 @@ using BlackDigital.Report.Example.Model;
 using DocumentFormat.OpenXml;
 
 List<TestModel> list = new();
-
 list.Add(new("Line 1", 10, DateTime.Today, TimeSpan.FromHours(3)));
 list.Add(new("Line 2", -10, DateTime.Now, TimeSpan.FromMinutes(12)));
 list.Add(new("Line 3", 10.6d, DateTime.UtcNow, TimeSpan.FromMinutes(45).Add(TimeSpan.FromSeconds(31))));
@@ -34,9 +33,8 @@ var report = ReportGenerator.Spreadsheet()
                             .AddSheet("Second")
                             .AddValue("My text header")
                             .AddTable("Data2", "B3")
-                            .FillObject(list)
-                            /*.AddHeader(headers)
-                            .Fill(list2)*/
+                            .AddHeader(headers)
+                            .Fill(list2)
                             .BuildAsync();
     
 File.WriteAllBytes(@"d:\teste\test.xlsx", report.Result);

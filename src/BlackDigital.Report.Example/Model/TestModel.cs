@@ -8,8 +8,6 @@ namespace BlackDigital.Report.Example.Model
 {
     public class TestModel
     {
-        public TestModel() { }
-
         public TestModel(string name, double number, DateTime objDate, TimeSpan time)
         {
             Name = name;
