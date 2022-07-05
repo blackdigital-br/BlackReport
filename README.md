@@ -6,6 +6,20 @@ Currently it is only generating reports in spreadsheets.
 
 **Alpha version, can be changed at any time without notice.**
 
+
+```csharp
+    using BlackDigital.Report;
+
+    ReportGenerator.Spreadsheet()
+                   .AddSheet("First")
+                   .AddTable("Data")
+                   .FillObject(list)
+                   .BuildAsync(@"test.xlsx");
+```
+
+![Example](https://raw.githubusercontent.com/blackdigital-br/BlackReport/main/docs/images/ClassExample.png)
+
+
 * [Installing](#installing)
 * [Coding](#coding)
     * [From class list](#from-class-list)
@@ -154,8 +168,8 @@ https://github.com/blackdigital-br/BlackReport/tree/main/src/BlackDigital.Report
 
 ## Roadmap
 
-    ☑️ Excel Tables. (0.1.0.0)
-    ☑️ Fill from instance class. (0.1.0.0)
+    ☑️ Excel Tables. (0.1.0)
+    ☑️ Fill from instance class. (0.1.0)
     ◼️ Use DisplayAttribute to get name of columns and properties that should be generated.
     ◼️ Excel Shared String.
     ◼️ Cells with formulas.
