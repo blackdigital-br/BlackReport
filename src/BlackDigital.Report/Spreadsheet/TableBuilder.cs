@@ -20,6 +20,8 @@ namespace BlackDigital.Report.Spreadsheet
             TableName = name;
             Row = row;
             Column = column;
+
+            SpreadsheetBuilder.Tables.Add(this);
         }
 
         #endregion "Constructor"
@@ -66,6 +68,8 @@ namespace BlackDigital.Report.Spreadsheet
             if (HasData)
                 throw new ArgumentException("Table already has data");
 
+            uint row = Row - 1;
+
             if (generateHeader)
             {
                 if (HasHeaders)
@@ -73,6 +77,7 @@ namespace BlackDigital.Report.Spreadsheet
 
                 Rows++;
                 HasHeaders = true;
+                row--;
             }
 
             ColumnsData = ReportHelper.GetObjectHeader<T>();
@@ -94,12 +99,12 @@ namespace BlackDigital.Report.Spreadsheet
             Rows += (uint)data.Count();
             HasData = true;
 
-            SheetBuilder.Fill(data, Column + 1, Row + 1);
+            SheetBuilder.Fill(data, Column, Row + 1);
 
             return this;
         }
 
-        public TableBuilder Header(IEnumerable<string> headers)
+        public TableBuilder AddHeader(IEnumerable<string> headers)
         {
             if (HasHeaders)
                 throw new ArgumentException("Table already has header");
@@ -107,6 +112,7 @@ namespace BlackDigital.Report.Spreadsheet
             if (Columns < headers.Count())
                 Columns = (uint)headers.Count();
 
+            Rows++;
             HasHeaders = true;
             ColumnsData.AddRange(headers);
             List<IEnumerable<object>> data = new();
@@ -123,12 +129,11 @@ namespace BlackDigital.Report.Spreadsheet
 
         internal void GenerateTablePart(WorksheetPart worksheetPart)
         {
-            uint index = (uint)SheetBuilder.Tables.IndexOf(this) + 1;
-            var tableDefinitionPart = worksheetPart.AddNewPart<TableDefinitionPart>($"rId{index}");
+            var tableDefinitionPart = worksheetPart.AddNewPart<TableDefinitionPart>();
 
             Table table = new()
             {
-                Id = index,
+                Id = (uint)SpreadsheetBuilder.Tables.IndexOf(this) + 1,
                 Name = TableName,
                 DisplayName = TableName,
                 TotalsRowShown = false
@@ -170,9 +175,10 @@ namespace BlackDigital.Report.Spreadsheet
             table.Append(tableStyleInfo);
 
             tableDefinitionPart.Table = table;
-            
+
+            //TableParts tableParts2 = (TableParts)worksheetPart.Worksheet.ChildElements.Where(ce => ce is TableParts).FirstOrDefault();
             TableParts tableParts = new() { Count = (UInt32)1 };
-            TablePart tablePart = new() { Id = "rId" + index };
+            TablePart tablePart = new() { Id = worksheetPart.GetIdOfPart(tableDefinitionPart) };
 
             tableParts.Append(tablePart);
 

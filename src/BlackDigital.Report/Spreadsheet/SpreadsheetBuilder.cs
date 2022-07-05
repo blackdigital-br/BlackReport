@@ -26,6 +26,8 @@ namespace BlackDigital.Report.Spreadsheet
 
         internal List<SheetBuilder> Sheets { get; private set; } = new();
 
+        internal List<TableBuilder> Tables { get; private set; } = new();
+
         #endregion "Properties"
 
         #region "Builder"
@@ -78,10 +80,11 @@ namespace BlackDigital.Report.Spreadsheet
             
             WorkbookPart workbookPart = WorkbookPart(document);
             GenerateWorkbookStylesPart(workbookPart);
+            Sheets sheets = workbookPart.Workbook.AppendChild<Sheets>(new());
 
             foreach (var sheet in Sheets)
             {
-                sheet.GenerateWorksheetPart(workbookPart, sharedStrings);
+                sheet.GenerateWorksheetPart(workbookPart, sheets, sharedStrings);
             }
 
             workbookPart.Workbook.Save();

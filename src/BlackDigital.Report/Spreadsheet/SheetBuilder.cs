@@ -49,7 +49,6 @@ namespace BlackDigital.Report.Spreadsheet
             return AddTable(name, column, row);
         }
 
-
         public TableBuilder AddTable(string name, uint column = 1, uint row = 1)
         {
             var table = new TableBuilder(SpreadsheetBuilder, this, name, column, row);
@@ -57,15 +56,15 @@ namespace BlackDigital.Report.Spreadsheet
             return table;
         }
         
-        public SheetBuilder AddValue(string cellReference, object value)
+        public SheetBuilder AddValue(object value, string cellReference)
         {
             var (column, row) = SpreadsheetHelper.CellReferenceToNumbers(cellReference);
 
 
-            return AddValue(column, row, value);
+            return AddValue(value, column, row);
         }
 
-        public SheetBuilder AddValue(uint column, uint row, object value)
+        public SheetBuilder AddValue(object value, uint column = 1, uint row = 1)
         {
             if (!Cells.ContainsKey(row))
                 Cells.Add(row, new());
@@ -108,7 +107,7 @@ namespace BlackDigital.Report.Spreadsheet
 
                 foreach (var columnData in rowData)
                 {
-                    AddValue(posColumn, posRow, columnData);
+                    AddValue(columnData, posColumn, posRow);
                     posColumn++;
                 }
 
@@ -122,21 +121,19 @@ namespace BlackDigital.Report.Spreadsheet
 
         #region "Generator"
 
-        internal void GenerateWorksheetPart(WorkbookPart workbookPart, HashSet<string> sharedStrings)
+        internal void GenerateWorksheetPart(WorkbookPart workbookPart, Sheets sheets, HashSet<string> sharedStrings)
         {
             WorksheetPart worksheetPart = workbookPart.AddNewPart<WorksheetPart>();
             SheetData sheetData = new();
             Worksheet worksheet = new(sheetData);
             worksheetPart.Worksheet = worksheet;
 
-            Sheets sheets = workbookPart.Workbook.AppendChild<Sheets>(new());
             Sheet sheet = new()
             {
                 Id = workbookPart.GetIdOfPart(worksheetPart),
                 SheetId = (uint)(SpreadsheetBuilder.Sheets.IndexOf(this) + 1),
                 Name = SheetName
             };
-
 
             CreateWorksheetColumns(worksheet, sheetData);
             CreateWorkSheetDataRows(sheetData);
