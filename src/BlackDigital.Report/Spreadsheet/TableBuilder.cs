@@ -176,13 +176,26 @@ namespace BlackDigital.Report.Spreadsheet
 
             tableDefinitionPart.Table = table;
 
-            //TableParts tableParts2 = (TableParts)worksheetPart.Worksheet.ChildElements.Where(ce => ce is TableParts).FirstOrDefault();
-            TableParts tableParts = new() { Count = (UInt32)1 };
+            TableParts tableParts = (TableParts)worksheetPart.Worksheet.ChildElements.FirstOrDefault(ce => ce is TableParts);
+
+            if (tableParts == null)
+            {
+                tableParts = new() { Count = (UInt32)1 };
+            }
+            else
+            {
+                if (tableParts.Count.HasValue)
+                    tableParts.Count++;
+                else
+                    tableParts.Count = (UInt32)1;
+            }
+
             TablePart tablePart = new() { Id = worksheetPart.GetIdOfPart(tableDefinitionPart) };
 
             tableParts.Append(tablePart);
 
-            worksheetPart.Worksheet.Append(tableParts);
+            if (tableParts.Count <= 1)
+                worksheetPart.Worksheet.Append(tableParts);
         }
 
         #endregion "Generator"

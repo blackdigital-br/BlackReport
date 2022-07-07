@@ -37,6 +37,9 @@ var report = ReportGenerator.Spreadsheet()
                             .AddTable("Data2", "B3")
                             .AddHeader(headers)
                             .Fill(list2)
+                            .Sheet()
+                            .AddTable("Data3", "g4")
+                            .FillObject(list)
                             .BuildAsync();
     
-File.WriteAllBytes(@"d:\teste\test.xlsx", report.Result);
+File.WriteAllBytes(@"test.xlsx", report.Result);
