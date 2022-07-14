@@ -171,6 +171,8 @@ https://github.com/blackdigital-br/BlackReport/tree/main/src/BlackDigital.Report
     ☑️ Excel Tables. (0.1.0)
     ☑️ Fill from instance class. (0.1.0)
     ☑️ Multiple tables in the same worksheet. (0.1.1)
+    ☑️ .NET5 (0.1.2)
+	☑️ Header Globalization. (0.1.2)
     ◼️ Use DisplayAttribute to get name of columns and properties that should be generated.
     ◼️ Excel Shared String.
     ◼️ Cells with formulas.

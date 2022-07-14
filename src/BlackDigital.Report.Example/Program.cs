@@ -1,11 +1,19 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
 using System;
-using System.IO;
+using System.Threading.Tasks;
 using BlackDigital.Report;
 using System.Collections.Generic;
 using BlackDigital.Report.Example.Model;
 using DocumentFormat.OpenXml;
+using BlackDigital.Report.Example.Resources;
+using System.Globalization;
+
+using System.IO;
+using System.Linq;
+using System.Net.Http;
+using System.Threading;
+
 
 List<TestModel> list = new();
 list.Add(new("Line 1", 10, DateTime.Today, TimeSpan.FromHours(3)));
@@ -28,21 +36,42 @@ List<string> headers = new()
 
 
 
-var report = ReportGenerator.Spreadsheet()
-                            .SetCompany("BlackDigital")
-                            .SetType(SpreadsheetDocumentType.Workbook)
-                            .AddSheet("First")
-                            .AddTable("Data")
-                            .FillObject(list)
-                            .Spreadsheet()
-                            .AddSheet("Second")
-                            .AddValue("My text header")
-                            .AddTable("Data2", "B3")
-                            .AddHeader(headers)
-                            .Fill(list2)
-                            .Sheet()
-                            .AddTable("Data3", "g4")
-                            .FillObject(list)
-                            .BuildAsync();
-    
-File.WriteAllBytes(@"test.xlsx", report.Result);
+var task = ReportGenerator.Spreadsheet()
+                .SetCompany("BlackDigital")
+                .SetType(SpreadsheetDocumentType.Workbook)
+                .AddSheet("First")
+                .AddTable("Data")
+                .FillObject(list)
+                .Spreadsheet()
+                .AddSheet("Second")
+                .AddValue("My text header")
+                .AddTable("Data2", "B3")
+                .AddHeader(headers)
+                .Fill(list2)
+                .Sheet()
+                .AddTable("Data3", "g4")
+                .FillObject(list)
+                .BuildAsync("test-default.xlsx");
+
+task.Wait();
+
+task = ReportGenerator.Spreadsheet()
+                .SetCompany("BlackDigital")
+                .SetType(SpreadsheetDocumentType.Workbook)
+                .SetResourceManager(Texts.ResourceManager)
+                .SetCultureInfo(new CultureInfo("pt"))
+                .AddSheet("First")
+                .AddTable("Data")
+                .FillObject(list)
+                .Spreadsheet()
+                .AddSheet("Second")
+                .AddValue("My text header")
+                .AddTable("Data2", "B3")
+                .AddHeader(headers)
+                .Fill(list2)
+                .Sheet()
+                .AddTable("Data3", "g4")
+                .FillObject(list)
+                .BuildAsync("test-pt.xlsx");
+
+task.Wait();
