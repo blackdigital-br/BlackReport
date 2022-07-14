@@ -7,6 +7,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Resources;
+using System.Globalization;
 using System.Threading.Tasks;
 
 namespace BlackDigital.Report.Spreadsheet
@@ -32,6 +34,12 @@ namespace BlackDigital.Report.Spreadsheet
         #endregion "Properties"
 
         #region "Builder"
+
+        public SpreadsheetBuilder SetResourceManager(ResourceManager resource) 
+            => this.SetResourceManager<SpreadsheetBuilder>(resource);
+
+        public SpreadsheetBuilder SetCultureInfo(CultureInfo culture)
+            => this.SetCultureInfo<SpreadsheetBuilder>(culture);
 
         public SpreadsheetBuilder SetCompany(string company)
         {

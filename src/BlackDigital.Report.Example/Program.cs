@@ -1,6 +1,9 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
+using System;
+using System.IO;
 using BlackDigital.Report;
+using System.Collections.Generic;
 using BlackDigital.Report.Example.Model;
 using DocumentFormat.OpenXml;
 

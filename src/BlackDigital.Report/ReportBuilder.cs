@@ -3,12 +3,42 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Resources;
+using System.Globalization;
 using System.Threading.Tasks;
 
 namespace BlackDigital.Report
 {
     public abstract class ReportBuilder
     {
+        #region "Properties"
+
+        internal ResourceManager? Resource { get; private set; }
+
+        internal CultureInfo? Culture { get; private set; }
+
+        #endregion "Properties"
+
+        #region "Builder"
+
+        protected TBuilder SetResourceManager<TBuilder>(ResourceManager resource)
+            where TBuilder : ReportBuilder
+        {
+            Resource = resource;
+            return (TBuilder)this;
+        }
+
+        protected TBuilder SetCultureInfo<TBuilder>(CultureInfo culture)
+            where TBuilder : ReportBuilder
+        {
+            Culture = culture;
+            return (TBuilder)this;
+        }
+
+        #endregion "Builder"
+
+        #region "Build"
+
         public abstract Task<byte[]> BuildAsync();
 
         public async Task BuildAsync(Stream stream)
@@ -25,5 +55,6 @@ namespace BlackDigital.Report
             await File.WriteAllBytesAsync(file, await BuildAsync());
         }
 
+        #endregion "Build"
     }
 }
