@@ -61,7 +61,6 @@ namespace BlackDigital.Report.Spreadsheet
         {
             var (column, row) = SpreadsheetHelper.CellReferenceToNumbers(cellReference);
 
-
             return AddValue(value, column, row);
         }
 
@@ -88,7 +87,10 @@ namespace BlackDigital.Report.Spreadsheet
 
         public SheetBuilder FillObject<T>(IEnumerable<T> data, uint column = 1, uint row = 1, bool generateHeader = true)
         {
-            return Fill(ReportHelper.ObjectToData(data), column, row);
+            return Fill(ReportHelper.ObjectToData(data, 
+                                                  generateHeader, 
+                                                  SpreadsheetBuilder.Resource, 
+                                                  SpreadsheetBuilder.Culture), column, row);
         }
         
         public SheetBuilder Fill(IEnumerable<IEnumerable<object>> data, string cellReference)

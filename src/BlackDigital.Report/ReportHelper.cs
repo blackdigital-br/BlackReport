@@ -2,24 +2,38 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using System.Resources;
+using System.Globalization;
 
 namespace BlackDigital.Report
 {
     internal static class ReportHelper
     {
-        internal static List<string> GetObjectHeader<T>()
+        internal static List<string> GetObjectHeader<T>(ResourceManager? resource, CultureInfo? culture)
         {
             var properties = typeof(T).GetProperties();
-            return properties.Select(p => p.Name).ToList();
+            return properties.Select(p => {
+                string columnName = p.Name;
+                
+                if (resource != null)
+                {
+                    var name = resource.GetString(columnName, culture);
+
+                    if (name != null)
+                        columnName = name;
+                }
+                
+                return columnName;
+            }).ToList();
         }
         
-        internal static List<List<object>> ObjectToData<T>(IEnumerable<T> data, bool generateHeader = true)
+        internal static List<List<object>> ObjectToData<T>(IEnumerable<T> data, bool generateHeader = true, ResourceManager? resource = null, CultureInfo? culture = null)
         {
             var list = new List<List<object>>();
 
             if (generateHeader)
-                list.Add(GetObjectHeader<T>().Cast<object>().ToList());
+                list.Add(GetObjectHeader<T>(resource, culture)
+                                        .Cast<object>().ToList());
             
             var properties = typeof(T).GetProperties();
 

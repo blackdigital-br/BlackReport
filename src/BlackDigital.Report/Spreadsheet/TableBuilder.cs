@@ -80,7 +80,7 @@ namespace BlackDigital.Report.Spreadsheet
                 row--;
             }
 
-            ColumnsData = ReportHelper.GetObjectHeader<T>();
+            ColumnsData = ReportHelper.GetObjectHeader<T>(SpreadsheetBuilder.Resource, SpreadsheetBuilder.Culture);
             Columns = (uint)ColumnsData.Count;
             Rows += (uint)data.Count();
             HasData = true;
