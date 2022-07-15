@@ -6,8 +6,6 @@ Currently it is only generating reports in spreadsheets.
 
 **Alpha version, can be changed at any time without notice.**
 
-[Wiki](https://github.com/blackdigital-br/BlackReport/wiki)
-
 ```csharp
     using BlackDigital.Report;
 
@@ -20,6 +18,7 @@ Currently it is only generating reports in spreadsheets.
 
 ![Example](https://raw.githubusercontent.com/blackdigital-br/BlackReport/main/docs/images/ClassExample.png)
 
+See more on the [Wiki](https://github.com/blackdigital-br/BlackReport/wiki)
 
 * [Installing](#installing)
 * [Coding](#coding)
