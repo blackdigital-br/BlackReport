@@ -13,7 +13,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading;
-
+using BlackDigital.Report.Example;
 
 List<TestModel> list = new();
 list.Add(new("Line 1", 10, DateTime.Today, TimeSpan.FromHours(3)));
