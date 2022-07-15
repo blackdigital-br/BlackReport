@@ -6,6 +6,7 @@ Currently it is only generating reports in spreadsheets.
 
 **Alpha version, can be changed at any time without notice.**
 
+[Wiki](https://github.com/blackdigital-br/BlackReport/wiki)
 
 ```csharp
     using BlackDigital.Report;
