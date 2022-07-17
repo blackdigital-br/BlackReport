@@ -265,7 +265,8 @@ namespace BlackDigital.Report.Spreadsheet
             xCellFormats.Append(xCellFormat);
 
             xCellFormat = new CellFormat();
-            xCellFormat.NumberFormatId = 164u;
+            xCellFormat.NumberFormatId = 168u;
+            //xCellFormat.NumberFormatId = 164u;
             xCellFormat.FontId = 0u;
             xCellFormat.FillId = 0u;
             xCellFormat.BorderId = 0u;
@@ -304,8 +305,10 @@ namespace BlackDigital.Report.Spreadsheet
             DifferentialFormat xDifferentialFormat = new DifferentialFormat();
 
             numberingFormat = new NumberingFormat();
-            numberingFormat.NumberFormatId = 164u;
-            numberingFormat.FormatCode = "[$-F400]h:mm:ss\\ AM/PM";
+            numberingFormat.NumberFormatId = 168u;
+            numberingFormat.FormatCode = "[h]:mm:ss;@";
+            //numberingFormat.NumberFormatId = 164u;
+            //numberingFormat.FormatCode = "[$-F400]h:mm:ss\\ AM/PM";
 
             xDifferentialFormat.Append(numberingFormat);
 
