@@ -34,7 +34,11 @@ List<string> headers = new()
     "Column 4"
 };
 
-
+//System.ComponentModel.DataAnnotations.DisplayAttribute a;
+//System.ComponentModel.DataAnnotations.DisplayColumnAttribute b;
+//System.ComponentModel.DataAnnotations.DisplayFormatAttribute c;
+//System.ComponentModel.DataAnnotations.TimestampAttribute d;
+//System.Text.Json.Serialization.JsonStringEnumConverter
 
 var task = ReportGenerator.Spreadsheet()
                 .SetCompany("BlackDigital")

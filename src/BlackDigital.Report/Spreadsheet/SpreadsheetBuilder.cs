@@ -136,8 +136,11 @@ namespace BlackDigital.Report.Spreadsheet
             numberingFormats.Count = 2u;
 
             NumberingFormat numberingFormat = new();
-            numberingFormat.NumberFormatId = 164u;
-            numberingFormat.FormatCode = "[$-F400]h:mm:ss\\ AM/PM";
+            numberingFormat.NumberFormatId = 168u;
+            numberingFormat.FormatCode = "[h]:mm:ss;@";
+
+            //numberingFormat.NumberFormatId = 164u;
+            //numberingFormat.FormatCode = "[$-F400]h:mm:ss\\ AM/PM";
 
             numberingFormats.Append(numberingFormat);
 
