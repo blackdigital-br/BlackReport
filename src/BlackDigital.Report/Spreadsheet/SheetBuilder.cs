@@ -191,71 +191,12 @@ namespace BlackDigital.Report.Spreadsheet
 
         private static Cell CreateCellByType(object value, string cellReference)
         {
-            if (value is string)
-                return CreateCellString(value.ToString(), cellReference);
-            else if (value is DateTime)
-                return CreateCellDateTime((DateTime)value, cellReference);
-            else if (value is DateTimeOffset)
-                return CreateCellDateTime(((DateTimeOffset)value).DateTime, cellReference);
-            else if (value is TimeSpan)
-                return CreateCellTimespan(((TimeSpan)value), cellReference);
-            else if (value is long || value is int || value is short || value is double || value is decimal || value is float)
-                return CreateCellDouble(Convert.ToDouble(value), cellReference);
-
-            return CreateCellNull(cellReference);
-        }
-
-        private static Cell CreateCellNull(string cellReference)
-        {
-            return new Cell()
+            return (new DefaultCellCreate()).CreateCell(new SpreadsheetFormatter
             {
-                DataType = CellValues.String,
-                CellValue = new CellValue(""),
+                Value = value,
+                ValueType = value?.GetType() ?? typeof(object),
                 CellReference = cellReference
-            };
-        }
-
-        private static Cell CreateCellString(string value, string cellReference)
-        {
-            return new Cell()
-            {
-                DataType = CellValues.String,
-                CellValue = new CellValue(value),
-                CellReference = cellReference
-            };
-        }
-
-        private static Cell CreateCellDateTime(DateTime value, string cellReference)
-        {
-            return new Cell()
-            {
-                DataType = CellValues.Date,
-                CellValue = new CellValue(value),
-                CellReference = cellReference,
-                StyleIndex = 2u
-            };
-        }
-
-        private static Cell CreateCellTimespan(TimeSpan value, string cellReference)
-        {
-            return new Cell()
-            {
-                DataType = CellValues.Number,
-                //CellValue = new CellValue((new DateTime(1900, 1, 1)).Add(value)),
-                CellValue = new CellValue(value.TotalSeconds / 86400),
-                CellReference = cellReference,
-                StyleIndex = 1u
-            };
-        }
-
-        private static Cell CreateCellDouble(double value, string cellReference)
-        {
-            return new Cell()
-            {
-                DataType = CellValues.Number,
-                CellValue = new CellValue(value),
-                CellReference = cellReference
-            };
+            });
         }
 
         #endregion "Generator"
