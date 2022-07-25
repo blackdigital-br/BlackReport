@@ -2,6 +2,7 @@
 using DocumentFormat.OpenXml.Spreadsheet;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -87,10 +88,15 @@ namespace BlackDigital.Report.Spreadsheet
 
         public SheetBuilder FillObject<T>(IEnumerable<T> data, uint column = 1, uint row = 1, bool generateHeader = true)
         {
+            CultureInfo? culture = null;
+
+            if (SpreadsheetBuilder.FormatProvider is CultureInfo cultureInfo)
+                culture = cultureInfo;
+
             return Fill(ReportHelper.ObjectToData(data, 
                                                   generateHeader, 
                                                   SpreadsheetBuilder.Resource, 
-                                                  SpreadsheetBuilder.Culture), column, row);
+                                                  culture), column, row);
         }
         
         public SheetBuilder Fill(IEnumerable<IEnumerable<object>> data, string cellReference)

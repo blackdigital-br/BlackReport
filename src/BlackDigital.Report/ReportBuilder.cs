@@ -15,7 +15,7 @@ namespace BlackDigital.Report
 
         internal ResourceManager? Resource { get; private set; }
 
-        internal CultureInfo? Culture { get; private set; }
+        internal IFormatProvider? FormatProvider { get; private set; }
 
         #endregion "Properties"
 
@@ -28,10 +28,10 @@ namespace BlackDigital.Report
             return (TBuilder)this;
         }
 
-        protected TBuilder SetCultureInfo<TBuilder>(CultureInfo culture)
+        protected TBuilder SetFormatProvider<TBuilder>(IFormatProvider formatProvider)
             where TBuilder : ReportBuilder
         {
-            Culture = culture;
+            FormatProvider = formatProvider;
             return (TBuilder)this;
         }
 

@@ -38,8 +38,8 @@ namespace BlackDigital.Report.Spreadsheet
         public SpreadsheetBuilder SetResourceManager(ResourceManager resource) 
             => this.SetResourceManager<SpreadsheetBuilder>(resource);
 
-        public SpreadsheetBuilder SetCultureInfo(CultureInfo culture)
-            => this.SetCultureInfo<SpreadsheetBuilder>(culture);
+        public SpreadsheetBuilder SetFormatProvider(IFormatProvider formatProvider)
+            => this.SetFormatProvider<SpreadsheetBuilder>(formatProvider);
 
         public SpreadsheetBuilder SetCompany(string company)
         {

@@ -2,6 +2,7 @@
 using DocumentFormat.OpenXml.Spreadsheet;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -80,7 +81,12 @@ namespace BlackDigital.Report.Spreadsheet
                 row--;
             }
 
-            ColumnsData = ReportHelper.GetObjectHeader<T>(SpreadsheetBuilder.Resource, SpreadsheetBuilder.Culture);
+            CultureInfo? culture = null;
+            
+            if (SpreadsheetBuilder.FormatProvider is CultureInfo cultureInfo)
+                culture = cultureInfo;
+
+            ColumnsData = ReportHelper.GetObjectHeader<T>(SpreadsheetBuilder.Resource, culture);
             Columns = (uint)ColumnsData.Count;
             Rows += (uint)data.Count();
             HasData = true;

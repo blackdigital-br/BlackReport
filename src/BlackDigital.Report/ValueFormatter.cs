@@ -11,5 +11,9 @@ namespace BlackDigital.Report
         public object? Value { get; init; }
 
         public Type ValueType { get; init; }
+
+        public IFormatProvider FormatProvider { get; init; }
+
+        public string Format { get; init; }
     }
 }

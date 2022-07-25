@@ -37,8 +37,8 @@ List<string> headers = new()
 //System.ComponentModel.DataAnnotations.DisplayAttribute a;
 //System.ComponentModel.DataAnnotations.DisplayColumnAttribute b;
 //System.ComponentModel.DataAnnotations.DisplayFormatAttribute c;
-//System.ComponentModel.DataAnnotations.TimestampAttribute d;
 //System.Text.Json.Serialization.JsonStringEnumConverter
+//string a;
 
 var task = ReportGenerator.Spreadsheet()
                 .SetCompany("BlackDigital")
@@ -63,7 +63,7 @@ task = ReportGenerator.Spreadsheet()
                 .SetCompany("BlackDigital")
                 .SetType(SpreadsheetDocumentType.Workbook)
                 .SetResourceManager(Texts.ResourceManager)
-                .SetCultureInfo(new CultureInfo("pt"))
+                .SetFormatProvider(new CultureInfo("pt"))
                 .AddSheet("First")
                 .AddTable("Data")
                 .FillObject(list)
