@@ -24,6 +24,11 @@ namespace BlackDigital.Report.Spreadsheet
             return columnString;
         }
 
+        internal static string NumberToExcelColumn(uint row, uint column)
+        {
+            return $"{NumberToExcelColumn(column)}{row}";
+        }
+
         internal static uint ExcelColumnToNumber(string column)
         {
             uint retVal = 0;

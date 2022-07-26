@@ -8,8 +8,8 @@ namespace BlackDigital.Report.Spreadsheet
 {
     public record SpreadsheetFormatter : ValueFormatter
     {
-        public HashSet<string> SharedString { get; init; }
+        public HashSet<string>? SharedString { get; init; }
 
-        public string CellReference { get; init; }
+        public string? CellReference { get; init; }
     }
 }

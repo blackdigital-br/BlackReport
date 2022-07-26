@@ -30,7 +30,7 @@ namespace BlackDigital.Report.Spreadsheet
 
         internal List<TableBuilder> Tables { get; private set; } = new();
 
-        internal Dictionary<uint, Dictionary<uint, object>> Cells { get; private set; } = new();
+        internal Dictionary<uint, Dictionary<uint, SpreadsheetFormatter>> Cells { get; private set; } = new();
 
         #endregion "Properties"
 
@@ -58,24 +58,33 @@ namespace BlackDigital.Report.Spreadsheet
             return table;
         }
         
-        public SheetBuilder AddValue(object value, string cellReference)
+        public SheetBuilder AddValue(object value, string cellReference, string? format = null, IFormatProvider? formatProvider = null)
         {
             var (column, row) = SpreadsheetHelper.CellReferenceToNumbers(cellReference);
 
-            return AddValue(value, column, row);
+            return AddValue(value, column, row, format, formatProvider);
         }
 
-        public SheetBuilder AddValue(object value, uint column = 1, uint row = 1)
+        public SheetBuilder AddValue(object value, uint column = 1, uint row = 1, string? format = null, IFormatProvider? formatProvider = null)
         {
             if (!Cells.ContainsKey(row))
                 Cells.Add(row, new());
 
             var rowData = Cells[row];
 
+            SpreadsheetFormatter formatter = new()
+            {
+                CellReference = SpreadsheetHelper.NumberToExcelColumn(row, column),
+                Format = format,
+                FormatProvider = formatProvider,
+                Value = value,
+                ValueType = value?.GetType() ?? typeof(object)
+            };
+
             if (rowData.ContainsKey(column))
-                rowData[column] = value;
+                rowData[column] = formatter;
             else
-                rowData.Add(column, value);
+                rowData.Add(column, formatter);
 
             return this;
         }
@@ -155,7 +164,7 @@ namespace BlackDigital.Report.Spreadsheet
             sheets.Append(sheet);
         }
 
-        private void CreateWorksheetColumns(Worksheet worksheet, SheetData sheetData)
+        private static void CreateWorksheetColumns(Worksheet worksheet, SheetData sheetData)
         {
             /*Columns xColumns = new();
 
@@ -181,28 +190,23 @@ namespace BlackDigital.Report.Spreadsheet
             }
         }
 
-        private void CreateWorksheetRow(uint row, Dictionary<uint, object> data, SheetData sheetData)
+        private static void CreateWorksheetRow(uint row, Dictionary<uint, SpreadsheetFormatter> data, SheetData sheetData)
         {
             Row cellRow = new();
             cellRow.RowIndex = (uint)row;
 
             foreach (var cellData in data)
             {
-                var letter = SpreadsheetHelper.NumberToExcelColumn(cellData.Key);
-                cellRow.Append(CreateCellByType(cellData.Value, $"{letter}{row}"));
+                var cellReference = SpreadsheetHelper.NumberToExcelColumn(row, cellData.Key);
+                cellRow.Append(CreateCellByType(cellData.Value, cellReference));
             }
 
             sheetData.Append(cellRow);
         }
 
-        private static Cell CreateCellByType(object value, string cellReference)
+        private static Cell CreateCellByType(SpreadsheetFormatter value, string cellReference)
         {
-            return (new DefaultCellCreate()).CreateCell(new SpreadsheetFormatter
-            {
-                Value = value,
-                ValueType = value?.GetType() ?? typeof(object),
-                CellReference = cellReference
-            });
+            return (new DefaultCellCreate()).CreateCell(value);
         }
 
         #endregion "Generator"
