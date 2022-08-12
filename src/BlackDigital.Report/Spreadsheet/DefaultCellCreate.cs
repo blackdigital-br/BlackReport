@@ -28,6 +28,13 @@ namespace BlackDigital.Report.Spreadsheet
             { typeof(DateTime), CreateCellDateTime },
             { typeof(DateTimeOffset), CreateCellDateTime },
             { typeof(TimeSpan), CreateCellTimespan }
+
+#if NET6_0_OR_GREATER
+            ,
+            { typeof(TimeOnly), CreateCellTimeOnly },
+            { typeof(DateOnly), CreateCellDateOnly }
+#endif
+
         };
             
         public Cell CreateCell(SpreadsheetFormatter formatter)
@@ -101,7 +108,7 @@ namespace BlackDigital.Report.Spreadsheet
                 DataType = CellValues.Date,
                 CellValue = new CellValue(value),
                 CellReference = formatter.CellReference,
-                StyleIndex = 2u
+                StyleIndex = (uint)SpreadsheetFormat.DateTime
             };
         }
 
@@ -117,11 +124,52 @@ namespace BlackDigital.Report.Spreadsheet
             return new Cell()
             {
                 DataType = CellValues.Number,
-                //CellValue = new CellValue((new DateTime(1900, 1, 1)).Add(value)),
                 CellValue = new CellValue(value.TotalSeconds / 86400),
                 CellReference = formatter.CellReference,
-                StyleIndex = 1u
+                StyleIndex = (uint)SpreadsheetFormat.TimeSpan
             };
         }
+
+#if NET6_0_OR_GREATER
+
+        private static Cell CreateCellTimeOnly(SpreadsheetFormatter formatter)
+        {
+            TimeOnly value;
+
+            if (formatter.Value is TimeOnly timeonly)
+                value = timeonly;
+            else
+                throw new InvalidOperationException("Invalid value type");
+
+            double totalSeconds = value.Ticks / 10000000;
+
+            return new Cell()
+            {
+                DataType = CellValues.Number,
+                CellValue = new CellValue(totalSeconds / 86400),
+                CellReference = formatter.CellReference,
+                StyleIndex = (uint)SpreadsheetFormat.TimeOnly
+            };
+        }
+
+        private static Cell CreateCellDateOnly(SpreadsheetFormatter formatter)
+        {
+            DateOnly value;
+
+            if (formatter.Value is DateOnly dateonly)
+                value = dateonly;
+            else
+                throw new InvalidOperationException("Invalid value type");
+
+            return new Cell()
+            {
+                DataType = CellValues.Date,
+                CellValue = new CellValue(value.ToDateTime(TimeOnly.MinValue)),
+                CellReference = formatter.CellReference,
+                StyleIndex = (uint)SpreadsheetFormat.DateOnly
+            };
+        }
+
+#endif
     }
 }

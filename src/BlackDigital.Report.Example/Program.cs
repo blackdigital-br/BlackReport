@@ -16,9 +16,20 @@ using System.Threading;
 using BlackDigital.Report.Example;
 
 List<TestModel> list = new();
+
+#if NET6_0_OR_GREATER
+
+list.Add(new("Line 1", 10, DateTime.Today, TimeSpan.FromHours(3), DateOnly.FromDateTime(DateTime.Today), new(3, 0)));
+list.Add(new("Line 2", -10, DateTime.Now, TimeSpan.FromMinutes(12), DateOnly.FromDateTime(DateTime.Today), new(5, 30)));
+list.Add(new("Line 3", 10.6d, DateTime.UtcNow, TimeSpan.FromMinutes(45).Add(TimeSpan.FromSeconds(31)), DateOnly.FromDateTime(DateTime.Today), new(17, 45)));
+
+#else
+
 list.Add(new("Line 1", 10, DateTime.Today, TimeSpan.FromHours(3)));
 list.Add(new("Line 2", -10, DateTime.Now, TimeSpan.FromMinutes(12)));
 list.Add(new("Line 3", 10.6d, DateTime.UtcNow, TimeSpan.FromMinutes(45).Add(TimeSpan.FromSeconds(31))));
+
+#endif
 
 var list2 = new List<List<object>>();
 

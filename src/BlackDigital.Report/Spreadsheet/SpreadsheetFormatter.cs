@@ -11,5 +11,7 @@ namespace BlackDigital.Report.Spreadsheet
         public HashSet<string>? SharedString { get; init; }
 
         public string? CellReference { get; init; }
+
+        public SpreadsheetFormat? FormatType { get; init; }
     }
 }

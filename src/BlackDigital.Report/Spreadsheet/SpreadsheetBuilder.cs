@@ -133,25 +133,27 @@ namespace BlackDigital.Report.Spreadsheet
 
 
             NumberingFormats numberingFormats = new();
-            numberingFormats.Count = 2u;
+            numberingFormats.Count = 3u;
 
             NumberingFormat numberingFormat = new();
             numberingFormat.NumberFormatId = 168u;
             numberingFormat.FormatCode = "[h]:mm:ss;@";
-
-            //numberingFormat.NumberFormatId = 164u;
-            //numberingFormat.FormatCode = "[$-F400]h:mm:ss\\ AM/PM";
-
             numberingFormats.Append(numberingFormat);
 
-            numberingFormat = new NumberingFormat();
+            numberingFormat = new();
             numberingFormat.NumberFormatId = 165u;
             numberingFormat.FormatCode = "d/m/yy\\ h:mm;@";
+            numberingFormats.Append(numberingFormat);
 
+            numberingFormat = new();
+            numberingFormat.NumberFormatId = 164u;
+            numberingFormat.FormatCode = "[$-F400]h:mm:ss\\ AM/PM";
             numberingFormats.Append(numberingFormat);
 
             stylesheet.Append(numberingFormats);
 
+
+            
             Fonts xFonts = new Fonts();
             xFonts.Count = 1u;
             xFonts.KnownFonts = true;
@@ -252,27 +254,33 @@ namespace BlackDigital.Report.Spreadsheet
 
             stylesheet.Append(xCellStyleFormats);
 
-            CellFormats xCellFormats = new CellFormats();
-            xCellFormats.Count = 3u;
+            CellFormats xCellFormats = new();
+            xCellFormats.Count = 5u;
 
-            xCellFormat = new CellFormat();
+            xCellFormat = new();
             xCellFormat.NumberFormatId = 0u;
             xCellFormat.FontId = 0u;
             xCellFormat.FillId = 0u;
             xCellFormat.BorderId = 0u;
             xCellFormat.FormatId = 0u;
-
             xCellFormats.Append(xCellFormat);
 
-            xCellFormat = new CellFormat();
-            xCellFormat.NumberFormatId = 168u;
-            //xCellFormat.NumberFormatId = 164u;
+            xCellFormat = new();
+            xCellFormat.NumberFormatId = 14u;
             xCellFormat.FontId = 0u;
             xCellFormat.FillId = 0u;
             xCellFormat.BorderId = 0u;
             xCellFormat.FormatId = 0u;
             xCellFormat.ApplyNumberFormat = true;
+            xCellFormats.Append(xCellFormat);
 
+            xCellFormat = new();
+            xCellFormat.NumberFormatId = 168u;
+            xCellFormat.FontId = 0u;
+            xCellFormat.FillId = 0u;
+            xCellFormat.BorderId = 0u;
+            xCellFormat.FormatId = 0u;
+            xCellFormat.ApplyNumberFormat = true;
             xCellFormats.Append(xCellFormat);
 
             xCellFormat = new CellFormat();
@@ -282,7 +290,15 @@ namespace BlackDigital.Report.Spreadsheet
             xCellFormat.BorderId = 0u;
             xCellFormat.FormatId = 0u;
             xCellFormat.ApplyNumberFormat = true;
+            xCellFormats.Append(xCellFormat);
 
+            xCellFormat = new();
+            xCellFormat.NumberFormatId = 164u;
+            xCellFormat.FontId = 0u;
+            xCellFormat.FillId = 0u;
+            xCellFormat.BorderId = 0u;
+            xCellFormat.FormatId = 0u;
+            xCellFormat.ApplyNumberFormat = true;
             xCellFormats.Append(xCellFormat);
 
             stylesheet.Append(xCellFormats);
@@ -299,43 +315,43 @@ namespace BlackDigital.Report.Spreadsheet
 
             stylesheet.Append(xCellStyles);
 
-            DifferentialFormats xDifferentialFormats = new DifferentialFormats();
+
+
+            
+            DifferentialFormats xDifferentialFormats = new();
             xDifferentialFormats.Count = 3u;
 
-            DifferentialFormat xDifferentialFormat = new DifferentialFormat();
-
-            numberingFormat = new NumberingFormat();
+            
+            DifferentialFormat xDifferentialFormat = new();
+            numberingFormat = new();
             numberingFormat.NumberFormatId = 168u;
             numberingFormat.FormatCode = "[h]:mm:ss;@";
-            //numberingFormat.NumberFormatId = 164u;
-            //numberingFormat.FormatCode = "[$-F400]h:mm:ss\\ AM/PM";
-
             xDifferentialFormat.Append(numberingFormat);
-
             xDifferentialFormats.Append(xDifferentialFormat);
 
-            xDifferentialFormat = new DifferentialFormat();
-
-            numberingFormat = new NumberingFormat();
+            xDifferentialFormat = new();
+            numberingFormat = new();
             numberingFormat.NumberFormatId = 165u;
             numberingFormat.FormatCode = "d/m/yy\\ h:mm;@";
-
             xDifferentialFormat.Append(numberingFormat);
-
             xDifferentialFormats.Append(xDifferentialFormat);
 
-            xDifferentialFormat = new DifferentialFormat();
-
-            numberingFormat = new NumberingFormat();
-            numberingFormat.NumberFormatId = 165u;
-            numberingFormat.FormatCode = "d/m/yy\\ h:mm;@";
-
+            xDifferentialFormat = new();
+            numberingFormat = new();
+            numberingFormat.NumberFormatId = 164u;
+            numberingFormat.FormatCode = "[$-F400]h:mm:ss\\ AM/PM";
             xDifferentialFormat.Append(numberingFormat);
-
             xDifferentialFormats.Append(xDifferentialFormat);
+
 
             stylesheet.Append(xDifferentialFormats);
 
+
+
+
+
+
+            
             TableStyles xTableStyles = new TableStyles();
             xTableStyles.Count = 0u;
             xTableStyles.DefaultTableStyle = "TableStyleMedium2";
