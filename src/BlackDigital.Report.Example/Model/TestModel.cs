@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,6 +20,7 @@ namespace BlackDigital.Report.Example.Model
 #endif
             )
         {
+            Id = DateTime.Now.Ticks;
             Name = name;
             Number = number;
 
@@ -33,12 +35,20 @@ namespace BlackDigital.Report.Example.Model
 
         }
 
+
+        [Display(Order = 1, AutoGenerateField = false)]
+        public long Id { get; set; }
+
+        [Display(Order = 1)]
         public string Name { get; set; }
 
+        [Display(Order = 2)]
         public double Number { get; set; }
 
+        [Display(Order = 4)]
         public DateTime ObjDate { get; set; }
 
+        [Display(Order = 3)]
         public TimeSpan Time { get; set; }
 
 #if NET6_0_OR_GREATER

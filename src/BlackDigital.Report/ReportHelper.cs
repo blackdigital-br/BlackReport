@@ -4,6 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Resources;
 using System.Globalization;
+using DocumentFormat.OpenXml.CustomProperties;
+using System.ComponentModel.DataAnnotations;
+using System.Reflection;
+using DocumentFormat.OpenXml.Office2013.Drawing.ChartStyle;
 
 namespace BlackDigital.Report
 {
@@ -11,10 +15,10 @@ namespace BlackDigital.Report
     {
         internal static List<string> GetObjectHeader<T>(ResourceManager? resource, CultureInfo? culture)
         {
-            var properties = typeof(T).GetProperties();
+            var properties = GetPropertiesAndAttributes<T>();
             return properties.Select(p => {
-                string columnName = p.Name;
-                
+                string columnName = p.Item2?.GetName() ?? p.Item1.Name;
+
                 if (resource != null)
                 {
                     var name = resource.GetString(columnName, culture);
@@ -35,7 +39,7 @@ namespace BlackDigital.Report
                 list.Add(GetObjectHeader<T>(resource, culture)
                                         .Cast<object>().ToList());
             
-            var properties = typeof(T).GetProperties();
+            var properties = GetPropertiesAndAttributes<T>();
 
             foreach (var row in data)
             {
@@ -43,7 +47,7 @@ namespace BlackDigital.Report
 
                 foreach (var property in properties)
                 {
-                    dataRow.Add(property.GetValue(row));
+                    dataRow.Add(property.Item1?.GetValue(row) ?? string.Empty);
                 }
 
                 list.Add(dataRow);
@@ -51,6 +55,25 @@ namespace BlackDigital.Report
 
 
             return list;
+        }
+
+        internal static List<Tuple<PropertyInfo, DisplayAttribute?>> GetPropertiesAndAttributes<T>()
+        {
+            var properties = typeof(T).GetProperties();
+
+            if (properties == null)
+                return new();
+
+            var all = properties.Select<PropertyInfo, Tuple<PropertyInfo, DisplayAttribute?>>(property => new(
+                            property,
+                            property?.GetCustomAttributes(typeof(DisplayAttribute), false)
+                                     .Cast<DisplayAttribute>()
+                                     .FirstOrDefault()
+            )).ToList();
+
+            all.RemoveAll(a => a.Item2 != null && a.Item2.GetAutoGenerateField() == false);
+
+            return all.OrderBy(a => a.Item2?.Order ?? Int32.MaxValue).ToList();
         }
     }
 }
