@@ -10,6 +10,7 @@ using System.Text;
 using System.Resources;
 using System.Globalization;
 using System.Threading.Tasks;
+using System.IO.Packaging;
 
 namespace BlackDigital.Report.Spreadsheet
 {
@@ -66,19 +67,36 @@ namespace BlackDigital.Report.Spreadsheet
 
         public override Task<byte[]> BuildAsync()
         {
-            return Task.Run(CreateSpreadsheet);
+            return Task.Run(() => {
+                using MemoryStream memoryStream = new();
+                CreateSpreadsheet(memoryStream);
+                return memoryStream.ToArray();
+            });
         }
 
-        private byte[] CreateSpreadsheet()
+        public override Task BuildAsync(string file)
         {
-            using MemoryStream memoryStream = new();
-            using SpreadsheetDocument document = SpreadsheetDocument.Create(memoryStream, DocumentType);
-            CreateParts(document);
-
-            document.Close();
-
-            return memoryStream.ToArray();
+            return Task.Run(() => {
+                using var fs = File.Create(file);
+                CreateSpreadsheet(fs);
+            });
         }
+
+        private void CreateSpreadsheet(Stream stream)
+        {
+            using var package = Package.Open(stream, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+            using SpreadsheetDocument document = SpreadsheetDocument.Create(package, DocumentType);
+            CreateParts(document);
+            document.Close();
+        }
+
+
+        /*private void CreateEmptyFile(string file)
+        {
+            using var fs = File.Create(file);
+            using var package = Package.Open(fs, FileMode.Create, FileAccess.Write);
+            using var excel = SpreadsheetDocument.Create(package, SpreadsheetDocumentType.Workbook))
+        }*/
 
         private void CreateParts(SpreadsheetDocument document)
         {

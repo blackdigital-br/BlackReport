@@ -41,7 +41,7 @@ namespace BlackDigital.Report
 
         public abstract Task<byte[]> BuildAsync();
 
-        public async Task BuildAsync(Stream stream)
+        public virtual async Task BuildAsync(Stream stream)
         {
             if (stream == null || !stream.CanWrite)
                 throw new ArgumentException("Stream is null or not writable");
@@ -50,7 +50,7 @@ namespace BlackDigital.Report
             await stream.WriteAsync(buffer);
         }
 
-        public async Task BuildAsync(string file)
+        public virtual async Task BuildAsync(string file)
         {
             await File.WriteAllBytesAsync(file, await BuildAsync());
         }
