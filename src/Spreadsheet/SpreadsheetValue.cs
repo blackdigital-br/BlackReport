@@ -9,13 +9,13 @@ namespace BlackDigital.Report.Spreadsheet
         internal SpreadsheetValue(SheetPosition position, ReportValue value, SpreadsheetFormatter? formatter = null)
         {
             Position = position;
+            FinalPosition = position;
             Value = value;
 
             if (formatter == null)
             {
                 formatter = new()
                 {
-                    CellReference = SpreadsheetHelper.NumberToExcelColumn(position.Row, position.Column),
                     Format = null,
                     FormatProvider = null
                 };
@@ -32,13 +32,20 @@ namespace BlackDigital.Report.Spreadsheet
 
         internal bool Processed => Value.Processed;
 
+        internal SheetPosition FinalPosition;
+
         internal bool ProcessRow(uint row)
         {
             if (Processed) return false;
 
             if (row < Position.Row) return false;
-            
-            return Value.NextRow();
+
+            var hasNextRow = Value.NextRow();
+
+            if (hasNextRow)
+                FinalPosition = FinalPosition.AddRow();
+
+            return hasNextRow;
         }
 
         internal bool ProcessColumn(uint column)
@@ -47,14 +54,18 @@ namespace BlackDigital.Report.Spreadsheet
 
             if (column < Position.Column) return false;
 
-            return Value.NextColumn();
+            var hasNextColumn = Value.NextColumn();
+
+            if (hasNextColumn)
+                FinalPosition = FinalPosition.AddColumn();
+
+            return hasNextColumn;
         }
 
         internal SpreadsheetFormatter GetFormatter(uint row, uint column)
         {
             return new()
             {
-                CellReference = SpreadsheetHelper.NumberToExcelColumn(row, column),
                 Format = null,
                 FormatProvider = null
             };

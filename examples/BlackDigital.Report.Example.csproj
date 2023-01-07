@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\BlackDigital.Report\BlackDigital.Report.csproj" />
+    <ProjectReference Include="..\src\BlackDigital.Report.csproj" />
   </ItemGroup>
 
   <ItemGroup>

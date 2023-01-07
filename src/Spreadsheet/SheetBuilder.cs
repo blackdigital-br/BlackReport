@@ -1,4 +1,5 @@
-﻿using DocumentFormat.OpenXml.Packaging;
+﻿using DocumentFormat.OpenXml.Office2016.Drawing.Command;
+using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 using System;
 using System.Collections.Generic;
@@ -48,18 +49,21 @@ namespace BlackDigital.Report.Spreadsheet
 
         public TableBuilder AddTable(string name, string cellReference)
         {
-            var (column, row) = SpreadsheetHelper.CellReferenceToNumbers(cellReference);
-
-            return AddTable(name, column, row);
+            return AddTable(name, (SheetPosition)cellReference);
         }
 
         public TableBuilder AddTable(string name, uint column = 1, uint row = 1)
         {
-            var table = new TableBuilder(SpreadsheetBuilder, this, name, column, row);
+            return AddTable(name, new SheetPosition(column, row));
+        }
+
+        public TableBuilder AddTable(string name, SheetPosition position)
+        {
+            var table = new TableBuilder(SpreadsheetBuilder, this, name, position);
             Tables.Add(table);
             return table;
         }
-        
+
         public SheetBuilder AddValue(object value, string cellReference, string? format = null, IFormatProvider? formatProvider = null)
         {
             var (column, row) = SpreadsheetHelper.CellReferenceToNumbers(cellReference);
@@ -76,7 +80,6 @@ namespace BlackDigital.Report.Spreadsheet
         {
             SpreadsheetFormatter formatter = new()
             {
-                CellReference = SpreadsheetHelper.NumberToExcelColumn(position.Row, position.Column),
                 Format = format,
                 FormatProvider = formatProvider
             };
@@ -100,18 +103,24 @@ namespace BlackDigital.Report.Spreadsheet
 
         public SheetBuilder FillObject<T>(IEnumerable<T> data, SheetPosition position, bool generateHeader = true)
         {
-            CultureInfo? culture = null;
+            /*CultureInfo? culture = null;
 
             if (SpreadsheetBuilder.FormatProvider is CultureInfo cultureInfo)
-                culture = cultureInfo;
+                culture = cultureInfo;*/
 
-            Values.Add(new SpreadsheetValue(position, new ModelReportValue<T>(data, generateHeader), null));
-
+            InternalFillObject(data, position, generateHeader);
             return this;
             /*return Fill(ReportHelper.ObjectToData(data,
                                                   generateHeader,
                                                   SpreadsheetBuilder.Resource,
                                                   culture), position.Column, position.Row);*/
+        }
+
+        internal SpreadsheetValue InternalFillObject<T>(IEnumerable<T> data, SheetPosition position, bool generateHeader)
+        {
+            var value = new SpreadsheetValue(position, new ModelReportValue<T>(data, generateHeader), null);
+            Values.Add(value);
+            return value;
         }
 
 
@@ -130,23 +139,14 @@ namespace BlackDigital.Report.Spreadsheet
         public SheetBuilder Fill(IEnumerable<IEnumerable<object>> data, SheetPosition position)
         {
             Values.Add(new SpreadsheetValue(position, new EnumerableReportValue(data)));
-            
-            /*uint posRow = position.Row;
-
-            foreach (var rowData in data)
-            {
-                uint posColumn = position.Column;
-
-                foreach (var columnData in rowData)
-                {
-                    AddValue(columnData, posColumn, posRow);
-                    posColumn++;
-                }
-
-                posRow++;
-            }*/
-
             return this;
+        }
+
+        internal SpreadsheetValue InternalFill(IEnumerable<IEnumerable<object>> data, SheetPosition position)
+        {
+            var value = new SpreadsheetValue(position, new EnumerableReportValue(data));
+            Values.Add(value);
+            return value;
         }
 
         #endregion "Builder"
@@ -168,7 +168,7 @@ namespace BlackDigital.Report.Spreadsheet
             };
 
             CreateWorksheetColumns(worksheet, sheetData);
-            CreateWorkSheetRowValue(sheetData);
+            CreateWorkSheetValues(sheetData);
 
             foreach (var table in Tables)
             {
@@ -196,7 +196,7 @@ namespace BlackDigital.Report.Spreadsheet
             //CreateWorksheetRow(columns, xSheetData, 1);
         }
 
-        private void CreateWorkSheetRowValue(SheetData sheetData)
+        private void CreateWorkSheetValues(SheetData sheetData)
         {
             var toProcess = Values.OrderBy(x => x.Position).ToList();
 
@@ -216,9 +216,7 @@ namespace BlackDigital.Report.Spreadsheet
                     while (processColumn.Any())
                     {
                         var value = processColumn.First();
-
-                        var cellReference = SpreadsheetHelper.NumberToExcelColumn(row, column);
-                        cellRow.Append(CreateCellByType(value.Value.GetValue(), value.GetFormatter(row, column)));
+                        cellRow.Append(CreateCellByType(new SheetPosition(column, row), value.Value.GetValue(), value.GetFormatter(row, column)));
 
                         column++;
                         processColumn = processRow.Where(x => x.ProcessColumn(column)).ToList();
@@ -234,33 +232,9 @@ namespace BlackDigital.Report.Spreadsheet
             }
         }
 
-        
-        
-        /*private void CreateWorkSheetDataRows(SheetData sheetData)
+        private static Cell CreateCellByType(SheetPosition position, object? value, SpreadsheetFormatter formatter)
         {
-            foreach (var row in Values.OrderBy(value => value.Position))
-            {
-                CreateWorksheetRow(row.Key, row.Value, sheetData);
-            }
-        }
-
-        private static void CreateWorksheetRow(uint row, Dictionary<uint, SpreadsheetFormatter> data, SheetData sheetData)
-        {
-            Row cellRow = new();
-            cellRow.RowIndex = (uint)row;
-
-            foreach (var cellData in data)
-            {
-                var cellReference = SpreadsheetHelper.NumberToExcelColumn(row, cellData.Key);
-                cellRow.Append(CreateCellByType(cellData.Value, cellReference));
-            }
-
-            sheetData.Append(cellRow);
-        }*/
-
-        private static Cell CreateCellByType(object? value, SpreadsheetFormatter formatter)
-        {
-            return (new DefaultCellCreate()).CreateCell(value, formatter);
+            return (new DefaultCellCreate()).CreateCell(position, value, formatter);
         }
 
         #endregion "Generator"

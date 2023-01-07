@@ -1,4 +1,4 @@
-﻿using DocumentFormat.OpenXml.Spreadsheet;
+﻿using DocumentFormat.OpenXml;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -42,6 +42,32 @@ namespace BlackDigital.Report.Spreadsheet
         public readonly uint Column;
 
         public readonly uint Row;
+        
+        public SheetPosition AddColumn(uint value = 1)
+        {
+            return new SheetPosition(Column + value, Row);
+        }
+
+        public SheetPosition AddRow(uint value = 1)
+        {
+            return new SheetPosition(Column, Row + value);
+        }
+
+        public uint CountColumns(SheetPosition position)
+        {
+            var max = Math.Max(Column, position.Column);
+            var min = Math.Min(Column, position.Column);
+
+            return max - min + 1;
+        }
+
+        public uint CountRows(SheetPosition position)
+        {
+            var max = Math.Max(Row, position.Row);
+            var min = Math.Min(Row, position.Row);
+
+            return max - min + 1;
+        }
 
         private string GetLetterPosition()
         {
@@ -126,6 +152,11 @@ namespace BlackDigital.Report.Spreadsheet
         public static implicit operator SheetPosition(string cellReference)
         {
             return new SheetPosition(cellReference);
+        }
+
+        public static implicit operator StringValue(SheetPosition sheetPosition)
+        {
+            return new StringValue(sheetPosition.ToString());
         }
     }
 }
