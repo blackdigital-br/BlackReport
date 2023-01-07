@@ -42,7 +42,10 @@ namespace BlackDigital.Report
 
         internal override object? GetValue()
         {
-            if (!Processed)
+
+            if (!Processed
+                && RowProcessed
+                && ColumnProcessed)
             {
                 return Value;
             }
