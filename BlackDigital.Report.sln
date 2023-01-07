@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.2.32602.215
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlackDigital.Report", "BlackDigital.Report\BlackDigital.Report.csproj", "{29D2B22C-10FE-4A5A-818B-ED143B5F93B7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlackDigital.Report", "src\BlackDigital.Report.csproj", "{29D2B22C-10FE-4A5A-818B-ED143B5F93B7}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlackDigital.Report.Example", "BlackDigital.Report.Example\BlackDigital.Report.Example.csproj", "{2D569F9A-A69B-4BEB-ACDB-80552C074F4F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlackDigital.Report.Example", "examples\BlackDigital.Report.Example.csproj", "{2D569F9A-A69B-4BEB-ACDB-80552C074F4F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
