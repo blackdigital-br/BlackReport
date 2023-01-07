@@ -9,6 +9,8 @@ namespace BlackDigital.Report.Spreadsheet
                                            IComparable<SheetPosition>,
                                            IEquatable<SheetPosition>
     {
+        #region "Constructors"
+
         public SheetPosition(uint column, uint row)
         {
             if (column < 1)
@@ -38,11 +40,19 @@ namespace BlackDigital.Report.Spreadsheet
             if (Row < 1)
                 throw new ArgumentOutOfRangeException(nameof(Row), "Row must be greater than 0.");
         }
-        
+
+        #endregion
+
+        #region Properties
+
         public readonly uint Column;
 
         public readonly uint Row;
-        
+
+        #endregion Properties
+
+        #region "Methods"
+
         public SheetPosition AddColumn(uint value = 1)
         {
             return new SheetPosition(Column + value, Row);
@@ -103,6 +113,10 @@ namespace BlackDigital.Report.Spreadsheet
             return retVal;
         }
 
+        #endregion "Methods"
+
+        #region "Operators"
+        
         public int CompareTo(object? obj)
         {
             if (obj == null)
@@ -163,5 +177,7 @@ namespace BlackDigital.Report.Spreadsheet
         {
             return new StringValue(sheetPosition.ToString());
         }
+
+        #endregion "Operators"
     }
 }
