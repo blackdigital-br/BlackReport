@@ -1,9 +1,11 @@
 ﻿
+using System.Collections.Generic;
+
 namespace BlackDigital.Report
 {
-    internal class SingleReportValue : ReportValue
+    internal class SingleReportSource : ReportSource
     {
-        internal SingleReportValue(object? value)
+        internal SingleReportSource(object? value)
         {
             Value = value;
         }
@@ -53,6 +55,14 @@ namespace BlackDigital.Report
             {
                 return null;
             }
+        }
+
+        internal override IEnumerable<IEnumerable<object>> GetAllData()
+        {
+            return new List<IEnumerable<object>>()
+            {
+                new object[] { Value }
+            };
         }
     }
 }

@@ -33,7 +33,7 @@ namespace BlackDigital.Report.Spreadsheet
 
         internal List<SpreadsheetValue> Values { get; private set; } = new();
         
-        //internal Dictionary<uint, Dictionary<uint, SpreadsheetFormatter>> Cells { get; private set; } = new();
+        //internal Dictionary<uint, Dictionary<uint, ValueFormatter>> Cells { get; private set; } = new();
 
         #endregion "Properties"
 
@@ -66,9 +66,7 @@ namespace BlackDigital.Report.Spreadsheet
 
         public SheetBuilder AddValue(object value, string cellReference, string? format = null, IFormatProvider? formatProvider = null)
         {
-            var (column, row) = SpreadsheetHelper.CellReferenceToNumbers(cellReference);
-
-            return AddValue(value, column, row, format, formatProvider);
+            return AddValue(value, new SheetPosition(cellReference), format, formatProvider);
         }
 
         public SheetBuilder AddValue(object value, uint column = 1, uint row = 1, string? format = null, IFormatProvider? formatProvider = null)
@@ -78,13 +76,13 @@ namespace BlackDigital.Report.Spreadsheet
 
         public SheetBuilder AddValue(object value, SheetPosition position, string? format = null, IFormatProvider? formatProvider = null)
         {
-            SpreadsheetFormatter formatter = new()
+            ValueFormatter formatter = new()
             {
                 Format = format,
                 FormatProvider = formatProvider
             };
 
-            Values.Add(new SpreadsheetValue(position, new SingleReportValue(value), formatter));
+            Values.Add(new SpreadsheetValue(position, new SingleReportSource(value), formatter));
 
             return this;
         }
@@ -92,8 +90,7 @@ namespace BlackDigital.Report.Spreadsheet
 
         public SheetBuilder FillObject<T>(IEnumerable<T> data, string cellReference, bool generateHeader = true)
         {
-            var (column, row) = SpreadsheetHelper.CellReferenceToNumbers(cellReference);
-            return FillObject(data, column, row, generateHeader);
+            return FillObject(data, new SheetPosition(cellReference), generateHeader);
         }
 
         public SheetBuilder FillObject<T>(IEnumerable<T> data, uint column = 1, uint row = 1, bool generateHeader = true)
@@ -118,7 +115,16 @@ namespace BlackDigital.Report.Spreadsheet
 
         internal SpreadsheetValue InternalFillObject<T>(IEnumerable<T> data, SheetPosition position, bool generateHeader)
         {
-            var value = new SpreadsheetValue(position, new ModelReportValue<T>(data, generateHeader), null);
+            var bodyPosition = position;
+
+            if (generateHeader)
+            {
+                var headerValue = new SpreadsheetValue(position, ReportHelper.GetObjectHeader<T>(null, null));
+                Values.Add(headerValue);
+                bodyPosition.AddRow(1);
+            }
+
+            var value = new SpreadsheetValue(bodyPosition, new ModelReportSource<T>(data), null);
             Values.Add(value);
             return value;
         }
@@ -126,9 +132,7 @@ namespace BlackDigital.Report.Spreadsheet
 
         public SheetBuilder Fill(IEnumerable<IEnumerable<object>> data, string cellReference)
         {
-            var (column, row) = SpreadsheetHelper.CellReferenceToNumbers(cellReference);
-
-            return Fill(data, column, row);
+            return Fill(data, new SheetPosition(cellReference));
         }
 
         public SheetBuilder Fill(IEnumerable<IEnumerable<object>> data, uint column = 1, uint row = 1)
@@ -138,13 +142,13 @@ namespace BlackDigital.Report.Spreadsheet
 
         public SheetBuilder Fill(IEnumerable<IEnumerable<object>> data, SheetPosition position)
         {
-            Values.Add(new SpreadsheetValue(position, new EnumerableReportValue(data)));
+            Values.Add(new SpreadsheetValue(position, new EnumerableReportSource(data)));
             return this;
         }
 
         internal SpreadsheetValue InternalFill(IEnumerable<IEnumerable<object>> data, SheetPosition position)
         {
-            var value = new SpreadsheetValue(position, new EnumerableReportValue(data));
+            var value = new SpreadsheetValue(position, new EnumerableReportSource(data));
             Values.Add(value);
             return value;
         }
@@ -232,7 +236,7 @@ namespace BlackDigital.Report.Spreadsheet
             }
         }
 
-        private static Cell CreateCellByType(SheetPosition position, object? value, SpreadsheetFormatter formatter)
+        private static Cell CreateCellByType(SheetPosition position, object? value, ValueFormatter formatter)
         {
             return (new DefaultCellCreate()).CreateCell(position, value, formatter);
         }

@@ -6,7 +6,7 @@ namespace BlackDigital.Report.Spreadsheet
 {
     internal sealed class DefaultCellCreate : ICellCreate
     {
-        private static Dictionary<Type, Func<SheetPosition, object?, SpreadsheetFormatter?, Cell>> _cellCreators = new()
+        private static Dictionary<Type, Func<SheetPosition, object?, ValueFormatter?, Cell>> _cellCreators = new()
         {
             { typeof(bool), CreateCellBoolean },
             { typeof(char), CreateCellString },
@@ -34,7 +34,7 @@ namespace BlackDigital.Report.Spreadsheet
 
         };
             
-        public Cell CreateCell(SheetPosition position, object? value, SpreadsheetFormatter formatter)
+        public Cell CreateCell(SheetPosition position, object? value, ValueFormatter formatter)
         {
             if (value == null)
                 return CreateCellDefault(position, value, formatter);
@@ -51,7 +51,7 @@ namespace BlackDigital.Report.Spreadsheet
             return CreateCellDefault(position, value, formatter);
         }
 
-        private static Cell CreateCellDefault(SheetPosition position, object? value, SpreadsheetFormatter formatter)
+        private static Cell CreateCellDefault(SheetPosition position, object? value, ValueFormatter formatter)
         {
             return new Cell()
             {
@@ -61,7 +61,7 @@ namespace BlackDigital.Report.Spreadsheet
             };
         }
 
-        private static Cell CreateCellString(SheetPosition position, object? value, SpreadsheetFormatter formatter)
+        private static Cell CreateCellString(SheetPosition position, object? value, ValueFormatter formatter)
         {
             return new Cell()
             {
@@ -71,7 +71,7 @@ namespace BlackDigital.Report.Spreadsheet
             };
         }
 
-        private static Cell CreateCellBoolean(SheetPosition position, object? value, SpreadsheetFormatter formatter)
+        private static Cell CreateCellBoolean(SheetPosition position, object? value, ValueFormatter formatter)
         {   
             return new Cell()
             {
@@ -81,7 +81,7 @@ namespace BlackDigital.Report.Spreadsheet
             };
         }
 
-        private static Cell CreateCellNumber(SheetPosition position, object? value, SpreadsheetFormatter formatter)
+        private static Cell CreateCellNumber(SheetPosition position, object? value, ValueFormatter formatter)
         {
             return new Cell()
             {
@@ -91,7 +91,7 @@ namespace BlackDigital.Report.Spreadsheet
             };
         }
 
-        private static Cell CreateCellDateTime(SheetPosition position, object? value, SpreadsheetFormatter formatter)
+        private static Cell CreateCellDateTime(SheetPosition position, object? value, ValueFormatter formatter)
         {
             DateTime realValue;
 
@@ -111,7 +111,7 @@ namespace BlackDigital.Report.Spreadsheet
             };
         }
 
-        private static Cell CreateCellTimespan(SheetPosition position, object? value, SpreadsheetFormatter formatter)
+        private static Cell CreateCellTimespan(SheetPosition position, object? value, ValueFormatter formatter)
         {
             TimeSpan realValue;
 
@@ -131,7 +131,7 @@ namespace BlackDigital.Report.Spreadsheet
 
 #if NET6_0_OR_GREATER
 
-        private static Cell CreateCellTimeOnly(SheetPosition position, object? value, SpreadsheetFormatter formatter)
+        private static Cell CreateCellTimeOnly(SheetPosition position, object? value, ValueFormatter formatter)
         {
             TimeOnly realValue;
 
@@ -151,7 +151,7 @@ namespace BlackDigital.Report.Spreadsheet
             };
         }
 
-        private static Cell CreateCellDateOnly(SheetPosition position, object? value, SpreadsheetFormatter formatter)
+        private static Cell CreateCellDateOnly(SheetPosition position, object? value, ValueFormatter formatter)
         {
             DateOnly realValue;
 

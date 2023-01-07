@@ -1,9 +1,11 @@
 ﻿
+using System.Collections.Generic;
+
 namespace BlackDigital.Report
 {
-    internal abstract class ReportValue
+    internal abstract class ReportSource
     {
-        internal ReportValue()
+        internal ReportSource()
         {
         }
         
@@ -14,5 +16,7 @@ namespace BlackDigital.Report
         internal abstract bool NextColumn();
 
         internal abstract object? GetValue();
+
+        internal abstract IEnumerable<IEnumerable<object>> GetAllData();
     }
 }

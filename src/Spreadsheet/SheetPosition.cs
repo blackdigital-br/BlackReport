@@ -53,6 +53,11 @@ namespace BlackDigital.Report.Spreadsheet
             return new SheetPosition(Column, Row + value);
         }
 
+        public SheetPosition Add(uint column, uint row)
+        {
+            return new SheetPosition(Column + column, Row + row);
+        }
+
         public uint CountColumns(SheetPosition position)
         {
             var max = Math.Max(Column, position.Column);

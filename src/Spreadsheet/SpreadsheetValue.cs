@@ -6,10 +6,9 @@ namespace BlackDigital.Report.Spreadsheet
 {
     public class SpreadsheetValue
     {
-        internal SpreadsheetValue(SheetPosition position, ReportValue value, SpreadsheetFormatter? formatter = null)
+        internal SpreadsheetValue(SheetPosition position, ReportSource value, ValueFormatter? formatter = null)
         {
             Position = position;
-            FinalPosition = position;
             Value = value;
 
             if (formatter == null)
@@ -26,13 +25,22 @@ namespace BlackDigital.Report.Spreadsheet
 
         public readonly SheetPosition Position;
 
-        internal readonly ReportValue Value;
+        internal readonly ReportSource Value;
 
-        public readonly SpreadsheetFormatter? Formatter;
+        public readonly ValueFormatter? Formatter;
 
         internal bool Processed => Value.Processed;
 
-        internal SheetPosition FinalPosition;
+        private uint RowProcessed = 0;
+        private uint ColumnProcessed = 0;
+
+        internal SheetPosition FinalPosition
+        {
+            get
+            {
+                return Position.Add(ColumnProcessed - 1, RowProcessed - 1);
+            }
+        }
 
         internal bool ProcessRow(uint row)
         {
@@ -43,7 +51,9 @@ namespace BlackDigital.Report.Spreadsheet
             var hasNextRow = Value.NextRow();
 
             if (hasNextRow)
-                FinalPosition = FinalPosition.AddRow();
+            {
+                RowProcessed++;
+            }
 
             return hasNextRow;
         }
@@ -56,13 +66,14 @@ namespace BlackDigital.Report.Spreadsheet
 
             var hasNextColumn = Value.NextColumn();
 
-            if (hasNextColumn)
-                FinalPosition = FinalPosition.AddColumn();
+            if (hasNextColumn
+                && RowProcessed == 1)
+                ColumnProcessed++;
 
             return hasNextColumn;
         }
 
-        internal SpreadsheetFormatter GetFormatter(uint row, uint column)
+        internal ValueFormatter GetFormatter(uint row, uint column)
         {
             return new()
             {

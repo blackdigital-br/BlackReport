@@ -55,14 +55,14 @@ var task = ReportGenerator.Spreadsheet()
                 .SetCompany("BlackDigital")
                 .SetType(SpreadsheetDocumentType.Workbook)
                 .AddSheet("First")
-                //.AddTable("Data")
-                .FillObject(list)
+                .AddTable("Data")
+                //.FillObject(list)
                 /*.Spreadsheet()
                 .AddSheet("Second")*/
                 //.AddValue("My text header")
-                /*.AddTable("Data2", "B3")
-                .AddHeader(headers)*/
-                //.Fill(list2)
+                /*.AddTable("Data2", "B3")*/
+                .AddHeader(headers)
+                .Fill(list2)
                 /*.Sheet()
                 .AddTable("Data3", "g4")
                 .FillObject(list)*/

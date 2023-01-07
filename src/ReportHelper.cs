@@ -1,22 +1,21 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Resources;
-using System.Globalization;
-using DocumentFormat.OpenXml.CustomProperties;
-using System.ComponentModel.DataAnnotations;
 using System.Reflection;
-using DocumentFormat.OpenXml.Office2013.Drawing.ChartStyle;
+using System.Globalization;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+
 
 namespace BlackDigital.Report
 {
     internal static class ReportHelper
     {
-        internal static List<string> GetObjectHeader<T>(ResourceManager? resource, CultureInfo? culture)
+        internal static EnumerableReportSource GetObjectHeader<T>(ResourceManager? resource, CultureInfo? culture)
         {
             var properties = GetPropertiesAndAttributes<T>();
-            return properties.Select(p => {
+            var header = properties.Select(p =>
+            {
                 string columnName = p.Item2?.GetName() ?? p.Item1.Name;
 
                 if (resource != null)
@@ -26,18 +25,19 @@ namespace BlackDigital.Report
                     if (name != null)
                         columnName = name;
                 }
-                
+
                 return columnName;
-            }).ToList();
+            }).AsEnumerable();
+
+            List<IEnumerable<string>> headerDataset = new();
+            headerDataset.Add(header);
+
+            return new EnumerableReportSource(headerDataset);
         }
         
-        internal static List<List<object>> ObjectToData<T>(IEnumerable<T> data, bool generateHeader = true, ResourceManager? resource = null, CultureInfo? culture = null)
+        internal static List<List<object>> ObjectToData<T>(IEnumerable<T> data)
         {
             var list = new List<List<object>>();
-
-            if (generateHeader)
-                list.Add(GetObjectHeader<T>(resource, culture)
-                                        .Cast<object>().ToList());
             
             var properties = GetPropertiesAndAttributes<T>();
 

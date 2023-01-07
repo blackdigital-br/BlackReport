@@ -40,7 +40,9 @@ namespace BlackDigital.Report.Spreadsheet
 
         private bool HasHeaders = false;
 
-        private SpreadsheetValue Value;
+        private SpreadsheetValue HeaderValue;
+
+        private SpreadsheetValue BodyValue;
         
         #endregion "Properties"
 
@@ -66,34 +68,41 @@ namespace BlackDigital.Report.Spreadsheet
                 if (HasHeaders)
                     throw new ArgumentException("Table already has header");
 
+                HeaderValue = new SpreadsheetValue(Position, ReportHelper.GetObjectHeader<T>(null, null));
                 HasHeaders = true;
             }
 
-            CultureInfo? culture = null;
+            if (!HasHeaders)
+                throw new ArgumentException("Table has no header");
+
+            /*CultureInfo? culture = null;
             
             if (SpreadsheetBuilder.FormatProvider is CultureInfo cultureInfo)
-                culture = cultureInfo;
+                culture = cultureInfo;*/
+
+            var position = Position;
+
+            if (HasHeaders)
+                position = position.AddRow(1);
 
             HasData = true;
-
-            Value = SheetBuilder.InternalFillObject(data, Position, generateHeader);
+            BodyValue = SheetBuilder.InternalFillObject(data, position, false);
 
             return this;
         }
         
         public TableBuilder Fill(IEnumerable<IEnumerable<object>> data)
         {
+            if (!HasHeaders)
+                throw new ArgumentException("Table has no header");
+
             if (HasData)
                 throw new ArgumentException("Table already has data");
 
             HasData = true;
+            var position = Position.AddRow(1);
 
-            var position = Position;
-
-            if (HasHeaders)
-                position = new SheetPosition(position.Column, position.Row + 1);
-
-            Value = SheetBuilder.InternalFill(data, position);
+            BodyValue = SheetBuilder.InternalFill(data, position);
 
             return this;
         }
@@ -110,8 +119,7 @@ namespace BlackDigital.Report.Spreadsheet
             List<IEnumerable<object>> data = new();
             data.Add(headers);
 
-            SheetBuilder.Fill(data, Position);
-
+            HeaderValue = SheetBuilder.InternalFill(data, Position);
             return this;
         }
 
@@ -134,7 +142,7 @@ namespace BlackDigital.Report.Spreadsheet
                 TotalsRowShown = false
             };
 
-            var reference = $"{Position}:{Value.Position}";
+            var reference = $"{Position}:{BodyValue.FinalPosition}";
             table.Reference = reference;
 
             AutoFilter autoFilter = new();
@@ -143,13 +151,14 @@ namespace BlackDigital.Report.Spreadsheet
             table.Append(autoFilter);
 
             TableColumns tableColumns = new();
-            tableColumns.Count = Position.CountColumns(Value.Position);
-
+            tableColumns.Count = Position.CountColumns(BodyValue.FinalPosition);
+            var headerData = HeaderValue.Value.GetAllData().First().ToList();
+                
             for (uint i = 0; i < tableColumns.Count; i++)
             {
                 TableColumn tableColumn = new();
                 tableColumn.Id = i + 1;
-                tableColumn.Name = $"Column {i}";
+                tableColumn.Name = headerData[(int)i].ToString();
 
                 tableColumns.Append(tableColumn);
             }
