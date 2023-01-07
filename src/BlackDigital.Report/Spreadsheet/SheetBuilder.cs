@@ -78,9 +78,7 @@ namespace BlackDigital.Report.Spreadsheet
             {
                 CellReference = SpreadsheetHelper.NumberToExcelColumn(position.Row, position.Column),
                 Format = format,
-                FormatProvider = formatProvider,
-                Value = value,
-                ValueType = value?.GetType() ?? typeof(object)
+                FormatProvider = formatProvider
             };
 
             Values.Add(new SpreadsheetValue(position, new SingleReportValue(value), formatter));
@@ -107,10 +105,13 @@ namespace BlackDigital.Report.Spreadsheet
             if (SpreadsheetBuilder.FormatProvider is CultureInfo cultureInfo)
                 culture = cultureInfo;
 
-            return Fill(ReportHelper.ObjectToData(data,
+            Values.Add(new SpreadsheetValue(position, new ModelReportValue<T>(data, generateHeader), null));
+
+            return this;
+            /*return Fill(ReportHelper.ObjectToData(data,
                                                   generateHeader,
                                                   SpreadsheetBuilder.Resource,
-                                                  culture), position.Column, position.Row);
+                                                  culture), position.Column, position.Row);*/
         }
 
 
@@ -128,7 +129,9 @@ namespace BlackDigital.Report.Spreadsheet
 
         public SheetBuilder Fill(IEnumerable<IEnumerable<object>> data, SheetPosition position)
         {
-            uint posRow = position.Row;
+            Values.Add(new SpreadsheetValue(position, new EnumerableReportValue(data)));
+            
+            /*uint posRow = position.Row;
 
             foreach (var rowData in data)
             {
@@ -141,7 +144,7 @@ namespace BlackDigital.Report.Spreadsheet
                 }
 
                 posRow++;
-            }
+            }*/
 
             return this;
         }
@@ -202,30 +205,31 @@ namespace BlackDigital.Report.Spreadsheet
                 var row = toProcess.First().Position.Row;
                 var processRow = toProcess.Where(x => x.ProcessRow(row)).ToList();
 
-                Row cellRow = new();
-                cellRow.RowIndex = (uint)row;
-
                 while (processRow.Any())
                 {
+                    Row cellRow = new();
+                    cellRow.RowIndex = (uint)row;
+
                     var column = processRow.First().Position.Column;
-                    var processColumn = processRow.Where(x => x.ProcessColumn(column)).ToList(); ;
+                    var processColumn = processRow.Where(x => x.ProcessColumn(column)).ToList();
 
                     while (processColumn.Any())
                     {
                         var value = processColumn.First();
 
-                        var cellReference = SpreadsheetHelper.NumberToExcelColumn(row, value.Position.Column);
-                        cellRow.Append(CreateCellByType(value.Formatter, cellReference));
+                        var cellReference = SpreadsheetHelper.NumberToExcelColumn(row, column);
+                        cellRow.Append(CreateCellByType(value.Value.GetValue(), value.GetFormatter(row, column)));
 
                         column++;
-                        processColumn = processRow.Where(x => x.ProcessColumn(column)).ToList(); ;
+                        processColumn = processRow.Where(x => x.ProcessColumn(column)).ToList();
                     }
 
+                    sheetData.Append(cellRow);
+
                     row++;
-                    processRow = toProcess.Where(x => x.ProcessRow(row)).ToList(); ;
+                    processRow = toProcess.Where(x => x.ProcessRow(row)).ToList();
                 }
 
-                sheetData.Append(cellRow);
                 toProcess.RemoveAll(p => p.Processed);
             }
         }
@@ -254,9 +258,9 @@ namespace BlackDigital.Report.Spreadsheet
             sheetData.Append(cellRow);
         }*/
 
-        private static Cell CreateCellByType(SpreadsheetFormatter value, string cellReference)
+        private static Cell CreateCellByType(object? value, SpreadsheetFormatter formatter)
         {
-            return (new DefaultCellCreate()).CreateCell(value);
+            return (new DefaultCellCreate()).CreateCell(value, formatter);
         }
 
         #endregion "Generator"

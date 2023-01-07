@@ -1,15 +1,12 @@
 ﻿using DocumentFormat.OpenXml.Spreadsheet;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BlackDigital.Report.Spreadsheet
 {
     internal sealed class DefaultCellCreate : ICellCreate
     {
-        private static Dictionary<Type, Func<SpreadsheetFormatter, Cell>> _cellCreators = new()
+        private static Dictionary<Type, Func<object?, SpreadsheetFormatter, Cell>> _cellCreators = new()
         {
             { typeof(bool), CreateCellBoolean },
             { typeof(char), CreateCellString },
@@ -37,22 +34,24 @@ namespace BlackDigital.Report.Spreadsheet
 
         };
             
-        public Cell CreateCell(SpreadsheetFormatter formatter)
+        public Cell CreateCell(object? value, SpreadsheetFormatter formatter)
         {
-            if (formatter.Value == null)
-                return CreateCellDefault(formatter);
+            if (value == null)
+                return CreateCellDefault(value, formatter);
 
-            if (_cellCreators.ContainsKey(formatter.ValueType))
-                return _cellCreators[formatter.ValueType](formatter);
+            var valueType = value?.GetType() ?? typeof(object);
+            
+            if (_cellCreators.ContainsKey(valueType))
+                return _cellCreators[valueType](value, formatter);
 
-            Type? nullType = Nullable.GetUnderlyingType(formatter.ValueType);
+            Type? nullType = Nullable.GetUnderlyingType(valueType);
             if (nullType != null && _cellCreators.ContainsKey(nullType))
-                return _cellCreators[nullType](formatter);
+                return _cellCreators[nullType](value, formatter);
 
-            return CreateCellDefault(formatter);
+            return CreateCellDefault(value, formatter);
         }
 
-        private static Cell CreateCellDefault(SpreadsheetFormatter formatter)
+        private static Cell CreateCellDefault(object? value, SpreadsheetFormatter formatter)
         {
             return new Cell()
             {
@@ -62,69 +61,69 @@ namespace BlackDigital.Report.Spreadsheet
             };
         }
 
-        private static Cell CreateCellString(SpreadsheetFormatter formatter)
+        private static Cell CreateCellString(object? value, SpreadsheetFormatter formatter)
         {
             return new Cell()
             {
                 DataType = CellValues.String,
-                CellValue = new CellValue(formatter.Value?.ToString() ?? string.Empty),
+                CellValue = new CellValue(value?.ToString() ?? string.Empty),
                 CellReference = formatter.CellReference
             };
         }
 
-        private static Cell CreateCellBoolean(SpreadsheetFormatter formatter)
+        private static Cell CreateCellBoolean(object? value, SpreadsheetFormatter formatter)
         {   
             return new Cell()
             {
                 DataType = CellValues.Boolean,
-                CellValue = new CellValue(Convert.ToBoolean(formatter.Value)),
+                CellValue = new CellValue(Convert.ToBoolean(value)),
                 CellReference = formatter.CellReference
             };
         }
 
-        private static Cell CreateCellNumber(SpreadsheetFormatter formatter)
+        private static Cell CreateCellNumber(object? value, SpreadsheetFormatter formatter)
         {
             return new Cell()
             {
                 DataType = CellValues.Number,
-                CellValue = new CellValue(Convert.ToDouble(formatter.Value)),
+                CellValue = new CellValue(Convert.ToDouble(value)),
                 CellReference = formatter.CellReference
             };
         }
 
-        private static Cell CreateCellDateTime(SpreadsheetFormatter formatter)
+        private static Cell CreateCellDateTime(object? value, SpreadsheetFormatter formatter)
         {
-            DateTime value;
+            DateTime realValue;
 
-            if (formatter.Value is DateTime dateTime)
-                value = dateTime;
-            else if (formatter.Value is DateTimeOffset dateTimeOffset)
-                value = dateTimeOffset.DateTime;
+            if (value is DateTime dateTime)
+                realValue = dateTime;
+            else if (value is DateTimeOffset dateTimeOffset)
+                realValue = dateTimeOffset.DateTime;
             else
                 throw new InvalidOperationException("Invalid value type");
 
             return new Cell()
             {
                 DataType = CellValues.Date,
-                CellValue = new CellValue(value),
+                CellValue = new CellValue(realValue),
                 CellReference = formatter.CellReference,
                 StyleIndex = (uint)SpreadsheetFormat.DateTime
             };
         }
 
-        private static Cell CreateCellTimespan(SpreadsheetFormatter formatter)
+        private static Cell CreateCellTimespan(object? value, SpreadsheetFormatter formatter)
         {
-            TimeSpan value;
+            TimeSpan realValue;
 
-            if (formatter.Value is TimeSpan timeSpan)
-                value = timeSpan;
+            if (value is TimeSpan timeSpan)
+                realValue = timeSpan;
             else
                 throw new InvalidOperationException("Invalid value type");
 
             return new Cell()
             {
                 DataType = CellValues.Number,
-                CellValue = new CellValue(value.TotalSeconds / 86400),
+                CellValue = new CellValue(realValue.TotalSeconds / 86400),
                 CellReference = formatter.CellReference,
                 StyleIndex = (uint)SpreadsheetFormat.TimeSpan
             };
@@ -132,16 +131,16 @@ namespace BlackDigital.Report.Spreadsheet
 
 #if NET6_0_OR_GREATER
 
-        private static Cell CreateCellTimeOnly(SpreadsheetFormatter formatter)
+        private static Cell CreateCellTimeOnly(object? value, SpreadsheetFormatter formatter)
         {
-            TimeOnly value;
+            TimeOnly realValue;
 
-            if (formatter.Value is TimeOnly timeonly)
-                value = timeonly;
+            if (value is TimeOnly timeonly)
+                realValue = timeonly;
             else
                 throw new InvalidOperationException("Invalid value type");
 
-            double totalSeconds = value.Ticks / 10000000;
+            double totalSeconds = realValue.Ticks / 10000000;
 
             return new Cell()
             {
@@ -152,19 +151,19 @@ namespace BlackDigital.Report.Spreadsheet
             };
         }
 
-        private static Cell CreateCellDateOnly(SpreadsheetFormatter formatter)
+        private static Cell CreateCellDateOnly(object? value, SpreadsheetFormatter formatter)
         {
-            DateOnly value;
+            DateOnly realValue;
 
-            if (formatter.Value is DateOnly dateonly)
-                value = dateonly;
+            if (value is DateOnly dateonly)
+                realValue = dateonly;
             else
                 throw new InvalidOperationException("Invalid value type");
 
             return new Cell()
             {
                 DataType = CellValues.Date,
-                CellValue = new CellValue(value.ToDateTime(TimeOnly.MinValue)),
+                CellValue = new CellValue(realValue.ToDateTime(TimeOnly.MinValue)),
                 CellReference = formatter.CellReference,
                 StyleIndex = (uint)SpreadsheetFormat.DateOnly
             };

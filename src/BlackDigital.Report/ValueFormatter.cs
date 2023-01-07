@@ -8,9 +8,9 @@ namespace BlackDigital.Report
 {
     public record ValueFormatter
     {
-        public object? Value { get; init; }
+        //public object? Value { get; init; }
 
-        public Type? ValueType { get; init; }
+        //public Type? ValueType { get; init; }
 
         public IFormatProvider? FormatProvider { get; init; }
 

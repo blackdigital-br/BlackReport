@@ -7,17 +7,23 @@ namespace BlackDigital.Report
         internal EnumerableReportValue(IEnumerable<IEnumerable<object>> data)
         {
             Data = data;
+            RowEnumarator = Data.GetEnumerator();
+            RowEnumarator.Reset();
         }
 
         private readonly IEnumerable<IEnumerable<object>> Data;
         protected IEnumerable<object> CurrentRow;
 
+        private IEnumerator<IEnumerable<object>> RowEnumarator;
+        private IEnumerator<object> ColumnEnumarator;
+
         internal override bool NextRow()
         {
-            if (Data.GetEnumerator().MoveNext())
+            if (RowEnumarator.MoveNext())
             {
-                CurrentRow = Data.GetEnumerator().Current;
-                CurrentRow.GetEnumerator().Reset();
+                CurrentRow = RowEnumarator.Current;
+                ColumnEnumarator = CurrentRow.GetEnumerator();
+                ColumnEnumarator.Reset();
                 return true;
             }
             else
@@ -29,14 +35,14 @@ namespace BlackDigital.Report
 
         internal override bool NextColumn()
         {
-            return CurrentRow.GetEnumerator().MoveNext();
+            return ColumnEnumarator.MoveNext();
         }
 
         internal override object? GetValue()
         {
             if (!Processed)
             {
-                return CurrentRow.GetEnumerator().Current;
+                return ColumnEnumarator.Current;
             }
             else
             {

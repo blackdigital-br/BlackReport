@@ -55,20 +55,22 @@ var task = ReportGenerator.Spreadsheet()
                 .SetCompany("BlackDigital")
                 .SetType(SpreadsheetDocumentType.Workbook)
                 .AddSheet("First")
-                .AddTable("Data")
+                //.AddTable("Data")
                 .FillObject(list)
-                .Spreadsheet()
-                .AddSheet("Second")
-                .AddValue("My text header")
-                .AddTable("Data2", "B3")
-                .AddHeader(headers)
-                .Fill(list2)
-                .Sheet()
+                /*.Spreadsheet()
+                .AddSheet("Second")*/
+                //.AddValue("My text header")
+                /*.AddTable("Data2", "B3")
+                .AddHeader(headers)*/
+                //.Fill(list2)
+                /*.Sheet()
                 .AddTable("Data3", "g4")
-                .FillObject(list)
+                .FillObject(list)*/
                 .BuildAsync("test-default.xlsx");
 
 task.Wait();
+
+return;
 
 task = ReportGenerator.Spreadsheet()
                 .SetCompany("BlackDigital")

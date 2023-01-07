@@ -1,13 +1,12 @@
 ﻿
-using DocumentFormat.OpenXml.Spreadsheet;
-using DocumentFormat.OpenXml.Wordprocessing;
+
 using System;
 
 namespace BlackDigital.Report.Spreadsheet
 {
-    internal class SpreadsheetValue
+    public class SpreadsheetValue
     {
-        public SpreadsheetValue(SheetPosition position, ReportValue value, SpreadsheetFormatter? formatter = null)
+        internal SpreadsheetValue(SheetPosition position, ReportValue value, SpreadsheetFormatter? formatter = null)
         {
             Position = position;
             Value = value;
@@ -18,9 +17,7 @@ namespace BlackDigital.Report.Spreadsheet
                 {
                     CellReference = SpreadsheetHelper.NumberToExcelColumn(position.Row, position.Column),
                     Format = null,
-                    FormatProvider = null,
-                    Value = value,
-                    ValueType = value?.GetType() ?? typeof(object)
+                    FormatProvider = null
                 };
             }
             
@@ -29,7 +26,7 @@ namespace BlackDigital.Report.Spreadsheet
 
         public readonly SheetPosition Position;
 
-        public readonly ReportValue Value;
+        internal readonly ReportValue Value;
 
         public readonly SpreadsheetFormatter? Formatter;
 
@@ -51,6 +48,16 @@ namespace BlackDigital.Report.Spreadsheet
             if (column < Position.Column) return false;
 
             return Value.NextColumn();
+        }
+
+        internal SpreadsheetFormatter GetFormatter(uint row, uint column)
+        {
+            return new()
+            {
+                CellReference = SpreadsheetHelper.NumberToExcelColumn(row, column),
+                Format = null,
+                FormatProvider = null
+            };
         }
     }
 }

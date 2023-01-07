@@ -11,25 +11,31 @@ namespace BlackDigital.Report
             IncludePropertyNames = includePropertyNames;
             ModelList = modelList;
             Properties = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance)
-                                  .ToList();
+                                  .AsEnumerable();
 
             PropertyNamesProcessed = IncludePropertyNames == false;
+            RowEnumarator = ModelList.GetEnumerator();
+            RowEnumarator.Reset();
         }
 
         private readonly bool IncludePropertyNames;
         private readonly IEnumerable<T> ModelList;
         protected readonly IEnumerable<PropertyInfo> Properties;
-        protected T CurrentModel;
+        protected T? CurrentModel;
         private bool PropertyNamesProcessed = false;
+
+        private IEnumerator<T> RowEnumarator;
+        private IEnumerator<PropertyInfo>? ColumnEnumarator;
 
         internal override bool NextRow()
         {
             if (PropertyNamesProcessed)
             {
-                if (ModelList.GetEnumerator().MoveNext())
+                if (RowEnumarator.MoveNext())
                 {
-                    CurrentModel = ModelList.GetEnumerator().Current;
-                    Properties.GetEnumerator().Reset();
+                    CurrentModel = RowEnumarator.Current;
+                    ColumnEnumarator = Properties.GetEnumerator();
+                    ColumnEnumarator.Reset();
                     return true;
                 }
                 else
@@ -40,14 +46,20 @@ namespace BlackDigital.Report
             }
             else
             {
-                PropertyNamesProcessed = true;
+                ColumnEnumarator = Properties.GetEnumerator();
+                ColumnEnumarator.Reset();
                 return true;
             }
         }
 
         internal override bool NextColumn()
         {
-            return Properties.GetEnumerator().MoveNext();
+            var hasColumn = ColumnEnumarator?.MoveNext() ?? false;
+
+            if (!hasColumn && !PropertyNamesProcessed)
+                PropertyNamesProcessed = true;
+
+            return hasColumn;
         }
 
         internal override object? GetValue()
@@ -56,11 +68,14 @@ namespace BlackDigital.Report
             {
                 if (PropertyNamesProcessed)
                 {
-                    return Properties.GetEnumerator().Current.GetValue(CurrentModel);
+                    if (CurrentModel == null)
+                        return null;
+
+                    return ColumnEnumarator?.Current.GetValue(CurrentModel);
                 }
                 else
                 {
-                    return Properties.GetEnumerator().Current.Name;
+                    return ColumnEnumarator?.Current.Name;
                 }
             }
             else

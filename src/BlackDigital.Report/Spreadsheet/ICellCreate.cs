@@ -9,6 +9,6 @@ namespace BlackDigital.Report.Spreadsheet
 {
     public interface ICellCreate
     {
-        Cell CreateCell(SpreadsheetFormatter formatter);
+        Cell CreateCell(object? value, SpreadsheetFormatter formatter);
     }
 }
