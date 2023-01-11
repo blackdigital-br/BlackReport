@@ -10,5 +10,7 @@ namespace BlackDigital.Report
     public static class ReportGenerator
     {
         public static SpreadsheetBuilder Spreadsheet() => new();
+
+        
     }
 }

@@ -55,6 +55,11 @@ namespace BlackDigital.Report
             await File.WriteAllBytesAsync(file, await BuildAsync());
         }
 
+        public virtual void SaveAsTemplate(string name)
+        {
+            BuilderTemplate.AddTemplate(name, this);
+        }
+
         #endregion "Build"
     }
 }
