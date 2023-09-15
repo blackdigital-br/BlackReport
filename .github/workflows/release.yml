@@ -14,19 +14,41 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+
     - name: Create Version
       run: echo "lib_version=$(date +'%y.%m.%d')" >> $GITHUB_ENV
+
+    - name: Create Tag Name
+      run: echo "tag_name=v${{ env.lib_version }}" >> $GITHUB_ENV
+
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: 7.0.x
+
     - name: Restore dependencies
       run: dotnet restore
+
     - name: Build
       run: dotnet build -p:Version='${{ env.lib_version }}' -c Release
+
     - name: Test
       run: dotnet test --verbosity normal
+
     - name: Pack nugets
       run: dotnet pack -p:PackageVersion='${{ env.lib_version }}' -c Release
+
+    - name: Create Tag
+       uses: actions/github-script@v5
+       with:
+          github-token: ${{ github.token }}
+          script: |
+            github.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: "refs/tags/${{ env.tag_name }}",
+              sha: context.sha
+            })
+
     - name: Push to NuGet
       run: dotnet nuget push "src/bin/Release/*.nupkg" --api-key ${{secrets.nuget_api_key}} --source https://api.nuget.org/v3/index.json

@@ -3,11 +3,11 @@
 	<PropertyGroup>
 		<TargetFrameworks>net7.0;net6.0;net5.0</TargetFrameworks>
 		<Nullable>enable</Nullable>
-		<AssemblyVersion>0.2.0</AssemblyVersion>
-		<FileVersion>0.2.0</FileVersion>
+		<AssemblyVersion>0.2.1</AssemblyVersion>
+		<FileVersion>0.2.1</FileVersion>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-		<Version>$(VersionPrefix)0.2.0</Version>
+		<Version>$(VersionPrefix)0.2.1</Version>
 		<Description>Simple report generator using OpenXML. Currently it is only generating reports in spreadsheets.</Description>
 		<PackageProjectUrl>https://github.com/blackdigital-br/BlackReport</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/blackdigital-br/BlackReport</RepositoryUrl>
@@ -28,7 +28,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="DocumentFormat.OpenXml" Version="2.19.0" />
+		<PackageReference Include="DocumentFormat.OpenXml" Version="2.20.0" />
 	</ItemGroup>
 
 
