@@ -1,10 +1,4 @@
-﻿using DocumentFormat.OpenXml.Packaging;
-using DocumentFormat.OpenXml.Spreadsheet;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Linq;
+﻿using System.IO;
 using System.Threading.Tasks;
 
 namespace BlackDigital.Report.Spreadsheet
@@ -13,24 +7,30 @@ namespace BlackDigital.Report.Spreadsheet
     {
         #region "Constructor"
 
-        internal TableBuilder(SpreadsheetBuilder spreadsheetBuilder, SheetBuilder sheetBuilder, 
-            string name, SheetPosition position)
+        internal TableBuilder(WorkbookBuilder spreadsheetBuilder, 
+                              SheetBuilder sheetBuilder,
+                              ReportConfiguration configuration,
+                              string name, 
+                              SheetPosition position)
         {
-            SpreadsheetBuilder = spreadsheetBuilder;
+            WorkbookBuilder = spreadsheetBuilder;
             SheetBuilder = sheetBuilder;
+            Configuration = configuration;
             TableName = name;
             Position = position;
 
-            SpreadsheetBuilder.Tables.Add(this);
+            WorkbookBuilder.Tables.Add(this);
         }
 
         #endregion "Constructor"
 
         #region "Properties"
 
-        private readonly SpreadsheetBuilder SpreadsheetBuilder;
+        private readonly WorkbookBuilder WorkbookBuilder;
 
         private readonly SheetBuilder SheetBuilder;
+
+        private readonly ReportConfiguration Configuration;
 
         private readonly string TableName;
 
@@ -40,9 +40,9 @@ namespace BlackDigital.Report.Spreadsheet
 
         private bool HasHeaders = false;
 
-        private SpreadsheetValue HeaderValue;
+        private ReportSource Header;
 
-        private SpreadsheetValue BodyValue;
+        private ReportSource Body;
         
         #endregion "Properties"
 
@@ -50,152 +50,88 @@ namespace BlackDigital.Report.Spreadsheet
 
         public SheetBuilder Sheet() => SheetBuilder;
 
-        public SpreadsheetBuilder Spreadsheet() => SpreadsheetBuilder;
+        public WorkbookBuilder Workbook() => WorkbookBuilder;
 
-        public Task<byte[]> BuildAsync() => SpreadsheetBuilder.BuildAsync();
+        public Task<ReportFile> BuildAsync() => WorkbookBuilder.BuildAsync();
 
-        public Task BuildAsync(Stream stream) => SpreadsheetBuilder.BuildAsync(stream);
+        public Task BuildAsync(Stream stream) => WorkbookBuilder.BuildAsync(stream);
 
-        public Task BuildAsync(string file) => SpreadsheetBuilder.BuildAsync(file);
+        public Task BuildAsync(string file) => WorkbookBuilder.BuildAsync(file);
 
-        public TableBuilder FillObject<T>(IEnumerable<T> data, bool generateHeader = true)
+        public TableBuilder AddHeader(ReportSource source)
         {
-            if (HasData)
-                throw new ArgumentException("Table already has data");
-
-            if (generateHeader)
-            {
-                if (HasHeaders)
-                    throw new ArgumentException("Table already has header");
-
-                HeaderValue = new SpreadsheetValue(Position, ReportHelper.GetObjectHeader<T>(null, null));
-                HasHeaders = true;
-            }
-
-            if (!HasHeaders)
-                throw new ArgumentException("Table has no header");
-
-            /*CultureInfo? culture = null;
-            
-            if (SpreadsheetBuilder.FormatProvider is CultureInfo cultureInfo)
-                culture = cultureInfo;*/
-
-            var position = Position;
-
             if (HasHeaders)
-                position = position.AddRow(1);
+                throw new System.Exception("Table already has headers");
 
-            HasData = true;
-            BodyValue = SheetBuilder.InternalFillObject(data, position, false);
-
-            return this;
-        }
-        
-        public TableBuilder Fill(IEnumerable<IEnumerable<object>> data)
-        {
-            if (!HasHeaders)
-                throw new ArgumentException("Table has no header");
-
-            if (HasData)
-                throw new ArgumentException("Table already has data");
-
-            HasData = true;
-            var position = Position.AddRow(1);
-
-            BodyValue = SheetBuilder.InternalFill(data, position);
-
-            return this;
-        }
-
-        public TableBuilder AddHeader(IEnumerable<string> headers)
-        {
-            if (HasData)
-                throw new ArgumentException("Table already has data");
-
-            if (HasHeaders)
-                throw new ArgumentException("Table already has header");
-            
             HasHeaders = true;
-            List<IEnumerable<object>> data = new();
-            data.Add(headers);
+            Header = source;
+            SheetBuilder.AddValue(source, Position);
 
-            HeaderValue = SheetBuilder.InternalFill(data, Position);
             return this;
         }
+
+        public TableBuilder AddHeader<T>(T data)
+            => AddHeader(Configuration.Sources.FindSource(data));
+
+        public TableBuilder AddBody(ReportSource source)
+        {
+            if (HasData)
+                throw new System.Exception("Table already has data");
+
+            HasData = true;
+            Body = source;
+            SheetBuilder.AddValue(source, Position.AddRow());
+
+            return this;
+        }
+
+        public TableBuilder AddBody<T>(T data)
+            => AddBody(Configuration.Sources.FindSource(data));
 
         #endregion "Builder"
 
         #region "Generator"
 
-        internal void GenerateTablePart(WorksheetPart worksheetPart)
+        public void Generate()
         {
-            if (!HasData)
-                return;
+            using MemoryStream tableMemoryStream = new();
+            using StreamWriter writer = new(tableMemoryStream);
 
-            var tableDefinitionPart = worksheetPart.AddNewPart<TableDefinitionPart>();
+            //var finalPosition = Position.AddRow(); //Header
+            var finalPosition = Position.AddRow(Body.RowCount); //Body
+            finalPosition = finalPosition.AddColumn(Body.ColumnCount - 1);
 
-            Table table = new()
+            string tableRef = $"{Position}:{finalPosition}";
+
+            writer.Write($"<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+            writer.Write($"<x:table xmlns:x=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" ");
+            writer.Write($"id=\"1\" name=\"{TableName}\" displayName=\"{TableName}\" ");
+            writer.Write($"ref=\"{tableRef}\" totalsRowShown=\"0\">");
+            writer.Write($"<x:autoFilter ref=\"{tableRef}\" />");
+            writer.Write($"<x:tableColumns count=\"{Header.ColumnCount}\">");
+
+            Header.Reset();
+            Header.NextRow();
+
+            for (int i = 1; i <= Header.ColumnCount; i++)
             {
-                Id = (uint)SpreadsheetBuilder.Tables.IndexOf(this) + 1,
-                Name = TableName,
-                DisplayName = TableName,
-                TotalsRowShown = false
-            };
-
-            var reference = $"{Position}:{BodyValue.FinalPosition}";
-            table.Reference = reference;
-
-            AutoFilter autoFilter = new();
-            autoFilter.Reference = reference;
-
-            table.Append(autoFilter);
-
-            TableColumns tableColumns = new();
-            tableColumns.Count = Position.CountColumns(BodyValue.FinalPosition);
-            var headerData = HeaderValue.Value.GetAllData().First().ToList();
-                
-            for (uint i = 0; i < tableColumns.Count; i++)
-            {
-                TableColumn tableColumn = new();
-                tableColumn.Id = i + 1;
-                tableColumn.Name = headerData[(int)i].ToString();
-
-                tableColumns.Append(tableColumn);
+                Header.NextColumn();
+                writer.Write($"<x:tableColumn id=\"{i}\" name=\"{Header.GetValue()}\" />");
             }
 
-            table.Append(tableColumns);
+            writer.Write($"</x:tableColumns>");
+            writer.Write($"<x:tableStyleInfo name=\"TableStyleMedium15\" showFirstColumn=\"0\" showLastColumn=\"0\" showRowStripes=\"1\" showColumnStripes=\"0\" />");
+            writer.Write("</x:table>");
 
-            TableStyleInfo tableStyleInfo = new();
-            tableStyleInfo.Name = "TableStyleMedium15";
-            tableStyleInfo.ShowFirstColumn = false;
-            tableStyleInfo.ShowLastColumn = false;
-            tableStyleInfo.ShowRowStripes = true;
-            tableStyleInfo.ShowColumnStripes = false;
+            writer.Flush();
 
-            table.Append(tableStyleInfo);
+            var filename = $"/xl/tables/{WorkbookBuilder.GetTableId(this)}.xml";
 
-            tableDefinitionPart.Table = table;
+            ReportFile file = new(filename,
+                                    "application/vnd.openxmlformats-officedocument.spreadsheetml.table+xml",
+                                    tableMemoryStream.ToArray());
 
-            TableParts tableParts = (TableParts)worksheetPart.Worksheet.ChildElements.FirstOrDefault(ce => ce is TableParts);
-
-            if (tableParts == null)
-            {
-                tableParts = new() { Count = (UInt32)1 };
-            }
-            else
-            {
-                if (tableParts.Count.HasValue)
-                    tableParts.Count++;
-                else
-                    tableParts.Count = (UInt32)1;
-            }
-
-            TablePart tablePart = new() { Id = worksheetPart.GetIdOfPart(tableDefinitionPart) };
-
-            tableParts.Append(tablePart);
-
-            if (tableParts.Count <= 1)
-                worksheetPart.Worksheet.Append(tableParts);
+            WorkbookBuilder.Files.Add(file);
         }
 
         #endregion "Generator"

@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Globalization;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using BlackDigital.Report.Sources;
 
 
 namespace BlackDigital.Report
@@ -32,7 +33,10 @@ namespace BlackDigital.Report
             List<IEnumerable<string>> headerDataset = new();
             headerDataset.Add(header);
 
-            return new EnumerableReportSource(headerDataset);
+            var source = new EnumerableReportSource();
+            source.Load(headerDataset);
+
+            return source;
         }
         
         internal static List<List<object>> ObjectToData<T>(IEnumerable<T> data)

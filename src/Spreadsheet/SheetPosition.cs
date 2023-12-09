@@ -1,7 +1,6 @@
-﻿using DocumentFormat.OpenXml;
-using System;
-using System.Diagnostics.CodeAnalysis;
+﻿using System;
 using System.Linq;
+using System.Diagnostics.CodeAnalysis;
 
 namespace BlackDigital.Report.Spreadsheet
 {
@@ -159,9 +158,23 @@ namespace BlackDigital.Report.Spreadsheet
 
         public override readonly int GetHashCode() => HashCode.Combine(Column, Row);
 
-        public static bool operator ==(SheetPosition left, SheetPosition right) => left.Column == right.Column && left.Row == right.Row;
+        public static bool operator ==(SheetPosition left, SheetPosition right) 
+            => left.Column == right.Column && left.Row == right.Row;
         
-        public static bool operator !=(SheetPosition left, SheetPosition right) => !(left == right);
+        public static bool operator !=(SheetPosition left, SheetPosition right) 
+            => !(left == right);
+
+        public static bool operator <(SheetPosition left, SheetPosition right) 
+            => left.CompareTo(right) < 0;
+
+        public static bool operator >(SheetPosition left, SheetPosition right) 
+            => left.CompareTo(right) > 0;
+
+        public static bool operator <=(SheetPosition left, SheetPosition right) 
+            => left.CompareTo(right) <= 0;
+
+        public static bool operator >=(SheetPosition left, SheetPosition right) 
+            => left.CompareTo(right) >= 0;
 
         public static implicit operator string(SheetPosition sheetPosition)
         {
@@ -171,11 +184,6 @@ namespace BlackDigital.Report.Spreadsheet
         public static implicit operator SheetPosition(string cellReference)
         {
             return new SheetPosition(cellReference);
-        }
-
-        public static implicit operator StringValue(SheetPosition sheetPosition)
-        {
-            return new StringValue(sheetPosition.ToString());
         }
 
         #endregion "Operators"

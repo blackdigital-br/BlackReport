@@ -2,7 +2,7 @@
 
 namespace BlackDigital.Report
 {
-    public record ValueFormatter
+    public class ValueFormatter
     {
         public IFormatProvider? FormatProvider { get; init; }
 

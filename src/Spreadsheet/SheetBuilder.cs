@@ -1,13 +1,7 @@
-﻿using DocumentFormat.OpenXml.Office2016.Drawing.Command;
-using DocumentFormat.OpenXml.Packaging;
-using DocumentFormat.OpenXml.Spreadsheet;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace BlackDigital.Report.Spreadsheet
 {
@@ -15,23 +9,31 @@ namespace BlackDigital.Report.Spreadsheet
     {
         #region "Constructor"
 
-        internal SheetBuilder(SpreadsheetBuilder spreadsheetBuilder, string name)
+        internal SheetBuilder(WorkbookBuilder spreadsheetBuilder, 
+                            ReportConfiguration configuration,
+                            string name)
         {
             SheetName = name;
-            SpreadsheetBuilder = spreadsheetBuilder;
+            WorkbookBuilder = spreadsheetBuilder;
+            Configuration = configuration;
+            Values = new();
         }
 
         #endregion "Constructor"
 
         #region "Properties"
 
-        private readonly SpreadsheetBuilder SpreadsheetBuilder;
+        private readonly WorkbookBuilder WorkbookBuilder;
 
-        private readonly string SheetName;
+        private readonly ReportConfiguration Configuration;
 
-        internal List<TableBuilder> Tables { get; private set; } = new();
+        internal protected readonly string SheetName;
 
-        internal List<SpreadsheetValue> Values { get; private set; } = new();
+        protected List<TableBuilder> Tables { get; private set; } = new();
+
+        protected Dictionary<SheetPosition, ReportSource> Values;
+
+        //internal List<SpreadsheetValue> Values { get; private set; } = new();
         
         //internal Dictionary<uint, Dictionary<uint, ValueFormatter>> Cells { get; private set; } = new();
 
@@ -39,13 +41,14 @@ namespace BlackDigital.Report.Spreadsheet
 
         #region "Builder"
 
-        public SpreadsheetBuilder Spreadsheet() => SpreadsheetBuilder;
+        public WorkbookBuilder Workbook() => WorkbookBuilder;
 
-        public Task<byte[]> BuildAsync() => SpreadsheetBuilder.BuildAsync();
+        public Task<ReportFile> BuildAsync() => WorkbookBuilder.BuildAsync();
 
-        public Task BuildAsync(Stream stream) => SpreadsheetBuilder.BuildAsync(stream);
+        public Task BuildAsync(Stream stream) => WorkbookBuilder.BuildAsync(stream);
 
-        public Task BuildAsync(string file) => SpreadsheetBuilder.BuildAsync(file);
+        public Task BuildAsync(string file) => WorkbookBuilder.BuildAsync(file);
+
 
         public TableBuilder AddTable(string name, string cellReference)
         {
@@ -59,186 +62,221 @@ namespace BlackDigital.Report.Spreadsheet
 
         public TableBuilder AddTable(string name, SheetPosition position)
         {
-            var table = new TableBuilder(SpreadsheetBuilder, this, name, position);
+            var table = new TableBuilder(WorkbookBuilder, 
+                                         this,
+                                         Configuration,
+                                         name, 
+                                         position);
             Tables.Add(table);
             return table;
         }
 
-        public SheetBuilder AddValue(object value, string cellReference, string? format = null, IFormatProvider? formatProvider = null)
-        {
-            return AddValue(value, new SheetPosition(cellReference), format, formatProvider);
-        }
+        public SheetBuilder AddValue(ReportSource source, string cellReference)
+            => AddValue(source, (SheetPosition)cellReference);
+        
+        public SheetBuilder AddValue(ReportSource source, uint column = 1, uint row = 1)
+            => AddValue(source, new SheetPosition(column, row));
 
-        public SheetBuilder AddValue(object value, uint column = 1, uint row = 1, string? format = null, IFormatProvider? formatProvider = null)
+        public SheetBuilder AddValue(ReportSource source, SheetPosition position)
         {
-            return AddValue(value, new SheetPosition(column, row), format, formatProvider);
-        }
-
-        public SheetBuilder AddValue(object value, SheetPosition position, string? format = null, IFormatProvider? formatProvider = null)
-        {
-            ValueFormatter formatter = new()
-            {
-                Format = format,
-                FormatProvider = formatProvider
-            };
-
-            Values.Add(new SpreadsheetValue(position, new SingleReportSource(value), formatter));
+            if (Values.ContainsKey(position))
+                Values[position] = source;
+            else
+                Values.Add(position, source);
 
             return this;
         }
 
+        public SheetBuilder AddValue<T>(T data, uint column = 1, uint row = 1)
+            => AddValue<T>(data, new SheetPosition(column, row));
 
-        public SheetBuilder FillObject<T>(IEnumerable<T> data, string cellReference, bool generateHeader = true)
-        {
-            return FillObject(data, new SheetPosition(cellReference), generateHeader);
-        }
+        public SheetBuilder AddValue<T>(T data, string cellReference)
+            => AddValue<T>(data, (SheetPosition)cellReference);
 
-        public SheetBuilder FillObject<T>(IEnumerable<T> data, uint column = 1, uint row = 1, bool generateHeader = true)
-        {
-            return FillObject(data, new SheetPosition(column, row), generateHeader);
-        }
-
-        public SheetBuilder FillObject<T>(IEnumerable<T> data, SheetPosition position, bool generateHeader = true)
-        {
-            /*CultureInfo? culture = null;
-
-            if (SpreadsheetBuilder.FormatProvider is CultureInfo cultureInfo)
-                culture = cultureInfo;*/
-
-            InternalFillObject(data, position, generateHeader);
-            return this;
-            /*return Fill(ReportHelper.ObjectToData(data,
-                                                  generateHeader,
-                                                  SpreadsheetBuilder.Resource,
-                                                  culture), position.Column, position.Row);*/
-        }
-
-        internal SpreadsheetValue InternalFillObject<T>(IEnumerable<T> data, SheetPosition position, bool generateHeader)
-        {
-            var bodyPosition = position;
-
-            if (generateHeader)
-            {
-                var headerValue = new SpreadsheetValue(position, ReportHelper.GetObjectHeader<T>(null, null));
-                Values.Add(headerValue);
-                bodyPosition.AddRow(1);
-            }
-
-            var value = new SpreadsheetValue(bodyPosition, new ModelReportSource<T>(data), null);
-            Values.Add(value);
-            return value;
-        }
-
-
-        public SheetBuilder Fill(IEnumerable<IEnumerable<object>> data, string cellReference)
-        {
-            return Fill(data, new SheetPosition(cellReference));
-        }
-
-        public SheetBuilder Fill(IEnumerable<IEnumerable<object>> data, uint column = 1, uint row = 1)
-        {
-            return Fill(data, new SheetPosition(column, row));
-        }
-
-        public SheetBuilder Fill(IEnumerable<IEnumerable<object>> data, SheetPosition position)
-        {
-            Values.Add(new SpreadsheetValue(position, new EnumerableReportSource(data)));
-            return this;
-        }
-
-        internal SpreadsheetValue InternalFill(IEnumerable<IEnumerable<object>> data, SheetPosition position)
-        {
-            var value = new SpreadsheetValue(position, new EnumerableReportSource(data));
-            Values.Add(value);
-            return value;
-        }
+        public SheetBuilder AddValue<T>(T value, SheetPosition position)
+            => AddValue(Configuration.Sources.FindSource<T>(value), position);
 
         #endregion "Builder"
 
         #region "Generator"
 
-        internal void GenerateWorksheetPart(WorkbookPart workbookPart, Sheets sheets, HashSet<string> sharedStrings)
+        /// <summary>
+        /// Generate sheets files
+        /// </summary>
+        /// <param name="configuration"></param>
+        public void Generate()
         {
-            WorksheetPart worksheetPart = workbookPart.AddNewPart<WorksheetPart>();
-            SheetData sheetData = new();
-            Worksheet worksheet = new(sheetData);
-            worksheetPart.Worksheet = worksheet;
+            GenerateSheet();
+            GenerateSheetRels();
+        }
 
-            Sheet sheet = new()
-            {
-                Id = workbookPart.GetIdOfPart(worksheetPart),
-                SheetId = (uint)(SpreadsheetBuilder.Sheets.IndexOf(this) + 1),
-                Name = SheetName
-            };
+        /// <summary>
+        /// Create a sheet.xml file
+        /// </summary>
+        /// <param name="configuration"></param>
+        private void GenerateSheet()
+        {
+            using MemoryStream sheetMemoryStream = new();
+            using StreamWriter writer = new(sheetMemoryStream);
 
-            CreateWorksheetColumns(worksheet, sheetData);
-            CreateWorkSheetValues(sheetData);
+            writer.Write($"<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+            writer.Write($"<worksheet xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\">");
+            writer.Write($"<sheetData>");
+            WriteSheet(writer);
+            writer.Write($"</sheetData>");
+            WriteTableParts(writer);
+            writer.Write($"</worksheet>");
+
+            writer.Flush();
+
+            var filename = $"/xl/worksheets/{WorkbookBuilder.GetSheetId(this)}.xml";
+
+            ReportFile file = new(filename,
+                                    "application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml",
+                                    sheetMemoryStream.ToArray());
+
+            WorkbookBuilder.Files.Add(file);
+        }
+
+        /// <summary>
+        /// Create a sheet.xml.rels file
+        /// </summary>
+        private void GenerateSheetRels()
+        {
+            using MemoryStream sheetMemoryStream = new();
+            using StreamWriter writer = new(sheetMemoryStream);
+
+            writer.Write($"<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+            writer.Write($"<Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\">");
 
             foreach (var table in Tables)
             {
-                table.GenerateTablePart(worksheetPart);
+                string tableId = WorkbookBuilder.GetTableId(table);
+                writer.Write($"<Relationship Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/table\" Target=\"/xl/tables/{tableId}.xml\" Id=\"{tableId}\" />");
             }
 
-            sheets.Append(sheet);
+            writer.Write($"</Relationships>");
+
+            writer.Flush();
+
+            var filename = $"/xl/worksheets/_rels/{WorkbookBuilder.GetSheetId(this)}.xml.rels";
+
+            ReportFile file = new(filename,
+                                    "application/vnd.openxmlformats-package.relationships+xml",
+                                    sheetMemoryStream.ToArray());
+
+            WorkbookBuilder.Files.Add(file);
         }
 
-        private static void CreateWorksheetColumns(Worksheet worksheet, SheetData sheetData)
+        /// <summary>
+        /// Find sources to write
+        /// </summary>
+        /// <param name="writer"></param>
+        private void WriteSheet(StreamWriter writer)
         {
-            /*Columns xColumns = new();
+            var sourceOrdened = Values.OrderBy(source => source.Key.Row)
+                                      .ThenBy(x => x.Key.Column)
+                                      .ToDictionary(x => x.Key, x => x.Value);
 
-            foreach (string column in columns)
+            SheetPosition position = sourceOrdened.First().Key;
+
+            while (sourceOrdened.Any())
             {
-                Column xColumn = new();
-                xColumn.Width = 15;
-                xColumn.Min = 1;
-                xColumn.Max = 1;
-                xColumn.CustomWidth = true;
-                xColumns.Append(xColumn);
-            }
+                Dictionary<SheetPosition, ReportSource> sources = new();
 
-            xWorksheet.Append(xColumns);*/
-            //CreateWorksheetRow(columns, xSheetData, 1);
-        }
-
-        private void CreateWorkSheetValues(SheetData sheetData)
-        {
-            var toProcess = Values.OrderBy(x => x.Position).ToList();
-
-            while (toProcess.Any())
-            {
-                var row = toProcess.First().Position.Row;
-                var processRow = toProcess.Where(x => x.ProcessRow(row)).ToList();
-
-                while (processRow.Any())
+                foreach (var source in sourceOrdened.ToArray())
                 {
-                    Row cellRow = new();
-                    cellRow.RowIndex = (uint)row;
-
-                    var column = processRow.First().Position.Column;
-                    var processColumn = processRow.Where(x => x.ProcessColumn(column)).ToList();
-
-                    while (processColumn.Any())
+                    if (position.Row >= source.Key.Row)
                     {
-                        var value = processColumn.First();
-                        cellRow.Append(CreateCellByType(new SheetPosition(column, row), value.Value.GetValue(), value.GetFormatter(row, column)));
-
-                        column++;
-                        processColumn = processRow.Where(x => x.ProcessColumn(column)).ToList();
+                        if (source.Value.NextRow())
+                            sources.Add(source.Key, source.Value);
+                        else
+                            sourceOrdened.Remove(source.Key);
                     }
-
-                    sheetData.Append(cellRow);
-
-                    row++;
-                    processRow = toProcess.Where(x => x.ProcessRow(row)).ToList();
                 }
 
-                toProcess.RemoveAll(p => p.Processed);
+                WriteRow(writer, sources, ref position);
+
+                position = new(1, position.Row + 1);
             }
         }
 
-        private static Cell CreateCellByType(SheetPosition position, object? value, ValueFormatter formatter)
+        /// <summary>
+        /// Write a row to sheet.xml file
+        /// </summary>
+        /// <param name="writer"></param>
+        /// <param name="sources"></param>
+        /// <param name="position"></param>
+        private void WriteRow(StreamWriter writer, 
+                              Dictionary<SheetPosition, ReportSource> sources,
+                              ref SheetPosition position)
         {
-            return (new DefaultCellCreate()).CreateCell(position, value, formatter);
+            if (!sources.Any())
+                return;
+
+            writer.Write($"<row r=\"{position.Row}\">");
+
+            while (sources.Any())
+            {
+                Dictionary<SheetPosition, ReportSource> columnSources = new();
+
+                foreach (var source in sources.ToArray())
+                {
+                    if (position.Column >= source.Key.Column)
+                    {
+                        if (source.Value.NextColumn())
+                            columnSources.Add(source.Key, source.Value);
+                        else
+                            sources.Remove(source.Key);
+                    }
+                }
+
+                WriteColumn(writer, columnSources, ref position);
+                position = position.AddColumn();
+            }
+            
+
+            writer.Write("</row>");
+            writer.Flush();
+        }
+
+        /// <summary>
+        /// Write a cell in column to sheet.xml file
+        /// </summary>
+        /// <param name="writer"></param>
+        /// <param name="sources"></param>
+        /// <param name="position"></param>
+        private void WriteColumn(StreamWriter writer,
+                                 Dictionary<SheetPosition, ReportSource> sources,
+                                 ref SheetPosition position)
+        {
+            if (!sources.Any())
+                return;
+                
+            writer.Write($"<c r=\"{position}\" t=\"str\">");
+            writer.Write($"<v>");
+            writer.Write(sources.First().Value.GetValue());
+            writer.Write($"</v>");
+            writer.Write("</c>");
+        }
+
+        /// <summary>
+        /// Write tableParts to sheet.xml file
+        /// </summary>
+        /// <param name="writer"></param>
+        private void WriteTableParts(StreamWriter writer)
+        {
+            if (Tables.Any())
+            {
+                writer.Write($"<tableParts count=\"{Tables.Count}\">");
+
+                foreach (var table in Tables)
+                {
+                    writer.Write($"<tablePart xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\" r:id=\"{WorkbookBuilder.GetTableId(table)}\" />");
+                }
+
+                writer.Write("</tableParts>");
+            }   
         }
 
         #endregion "Generator"

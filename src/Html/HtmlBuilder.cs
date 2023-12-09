@@ -8,7 +8,7 @@ namespace BlackDigital.Report.Html
 {
     public class HtmlBuilder : ReportBuilder
     {
-        public override Task<byte[]> BuildAsync()
+        public override Task<ReportFile> BuildAsync()
         {
             throw new NotImplementedException();
         }

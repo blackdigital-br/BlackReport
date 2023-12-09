@@ -1,13 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net7.0;net6.0;net5.0</TargetFrameworks>
+		<TargetFrameworks>net8.0;net7.0;net6.0;net5.0</TargetFrameworks>
 		<Nullable>enable</Nullable>
-		<AssemblyVersion>0.2.1</AssemblyVersion>
-		<FileVersion>0.2.1</FileVersion>
+		<AssemblyVersion>0.2.2</AssemblyVersion>
+		<FileVersion>0.2.2</FileVersion>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-		<Version>$(VersionPrefix)0.2.1</Version>
+		<Version>$(VersionPrefix)0.2.2</Version>
 		<Description>Simple report generator using OpenXML. Currently it is only generating reports in spreadsheets.</Description>
 		<PackageProjectUrl>https://github.com/blackdigital-br/BlackReport</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/blackdigital-br/BlackReport</RepositoryUrl>
@@ -15,6 +15,12 @@
 		<PackageIcon>Logo128.png</PackageIcon>
 		<TargetFrameworkProfile />
 	</PropertyGroup>
+
+	<ItemGroup>
+	  <Compile Remove="BlackDigital.Report\**" />
+	  <EmbeddedResource Remove="BlackDigital.Report\**" />
+	  <None Remove="BlackDigital.Report\**" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<None Include="..\docs\images\Logo128.png">
@@ -27,15 +33,16 @@
 		</None>
 	</ItemGroup>
 
-	<ItemGroup>
-		<PackageReference Include="DocumentFormat.OpenXml" Version="2.20.0" />
-	</ItemGroup>
-
 
 	<ItemGroup>
 		<AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
 			<_Parameter1>$(AssemblyName).Tests</_Parameter1>
 		</AssemblyAttribute>
+	</ItemGroup>
+
+
+	<ItemGroup>
+	  <PackageReference Include="System.IO.Packaging" Version="8.0.0" />
 	</ItemGroup>
 	
 </Project>

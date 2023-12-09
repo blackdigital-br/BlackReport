@@ -1,16 +1,13 @@
 ﻿using BlackDigital.Report.Spreadsheet;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace BlackDigital.Report
 {
     public static class ReportGenerator
     {
-        public static SpreadsheetBuilder Spreadsheet() => new();
+        public static WorkbookBuilder Spreadsheet() => new(new ReportConfiguration());
 
-        
+        public static WorkbookBuilder Spreadsheet(this Report report) 
+            => new(report.Configuration);
     }
 }

@@ -10,9 +10,10 @@ namespace BlackDigital.Report.Example
 {
     public static class ReportExtension
     {
-        public static SpreadsheetBuilder MyReport<TModel>(this SpreadsheetBuilder builder, string name, IEnumerable<TModel> list)
+        public static WorkbookBuilder MyReport<TModel>(this WorkbookBuilder builder, string name, IEnumerable<TModel> list)
         {
-            return builder.SetCompany("My Company")
+            return null;
+            /*return builder.SetCompany("My Company")
                           .AddSheet(name)
                           .AddValue("My Company")
                           .AddValue("Date: ", "A2")
@@ -20,10 +21,10 @@ namespace BlackDigital.Report.Example
                           .AddValue(name, "A3")
                           .AddTable("report", "A5")
                           .FillObject(list)
-                          .Spreadsheet();
+                          .Spreadsheet();*/
         }
 
-        public static async Task<string> BuilderReportAsync(this SpreadsheetBuilder builder)
+        public static async Task<string> BuilderReportAsync(this WorkbookBuilder builder)
         {
             string filename = Guid.NewGuid().ToString();
             filename = filename.Replace("-", "");

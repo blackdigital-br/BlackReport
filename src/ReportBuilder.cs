@@ -39,20 +39,21 @@ namespace BlackDigital.Report
 
         #region "Build"
 
-        public abstract Task<byte[]> BuildAsync();
+        public abstract Task<ReportFile> BuildAsync();
 
         public virtual async Task BuildAsync(Stream stream)
         {
             if (stream == null || !stream.CanWrite)
                 throw new ArgumentException("Stream is null or not writable");
             
-            var buffer = await BuildAsync();
-            await stream.WriteAsync(buffer);
+            var file = await BuildAsync();
+            await stream.WriteAsync(file.Content);
         }
 
-        public virtual async Task BuildAsync(string file)
+        public virtual async Task BuildAsync(string filename)
         {
-            await File.WriteAllBytesAsync(file, await BuildAsync());
+            var file = await BuildAsync();
+            await File.WriteAllBytesAsync(filename, file.Content);
         }
 
         public virtual void SaveAsTemplate(string name)

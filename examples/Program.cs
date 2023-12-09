@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using BlackDigital.Report;
 using System.Collections.Generic;
 using BlackDigital.Report.Example.Model;
-using DocumentFormat.OpenXml;
 using BlackDigital.Report.Example.Resources;
 using System.Globalization;
 
@@ -53,28 +52,28 @@ System.ComponentModel.DataAnnotations.DisplayAttribute a;
 
 var task = ReportGenerator.Spreadsheet()
                 .SetCompany("BlackDigital")
-                .SetType(SpreadsheetDocumentType.Workbook)
                 .AddSheet("First")
+                //.AddValue(list2)
                 .AddTable("Data")
-                //.FillObject(list)
+                .AddHeader(headers)
+                .AddBody(list2)
                 /*.Spreadsheet()
                 .AddSheet("Second")*/
                 //.AddValue("My text header")
                 /*.AddTable("Data2", "B3")*/
-                .AddHeader(headers)
-                .Fill(list2)
+                //.AddHeader(headers)
+                //.Fill(list2)
                 /*.Sheet()
                 .AddTable("Data3", "g4")
                 .FillObject(list)*/
-                .BuildAsync("test-default.xlsx");
+                .BuildAsync("D:\\Teste\\temp\\test-default.xlsx");
 
 task.Wait();
 
 return;
 
-task = ReportGenerator.Spreadsheet()
+/*task = ReportGenerator.Spreadsheet()
                 .SetCompany("BlackDigital")
-                .SetType(SpreadsheetDocumentType.Workbook)
                 .SetResourceManager(Texts.ResourceManager)
                 .SetFormatProvider(new CultureInfo("pt"))
                 .AddSheet("First")
@@ -89,6 +88,6 @@ task = ReportGenerator.Spreadsheet()
                 .Sheet()
                 .AddTable("Data3", "g4")
                 .FillObject(list)
-                .BuildAsync("test-pt.xlsx");
+                .BuildAsync("test-pt.xlsx");*/
 
 task.Wait();
