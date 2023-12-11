@@ -6,46 +6,46 @@ namespace BlackDigital.Report.Tests.Sources
     public class ReportSourceTest
     {
         [Fact]
-        public void SingleReportValue()
+        public async void SingleReportValue()
         {
             var value = new SingleReportSource();
             value.Load("Hello World");
 
-            Assert.Null(value.GetValue());
+            Assert.Null(await value.GetValueAsync());
 
-            Assert.True(value.NextRow());
-            Assert.True(value.NextColumn());
+            Assert.True(await value.NextRowAsync());
+            Assert.True(await value.NextColumnAsync());
 
-            Assert.Equal("Hello World", value.GetValue());
+            Assert.Equal("Hello World", await value.GetValueAsync());
 
-            Assert.False(value.NextColumn());
-            Assert.Null(value.GetValue());
+            Assert.False(await value.NextColumnAsync());
+            Assert.Null(await value.GetValueAsync());
 
-            Assert.False(value.NextRow());
-            Assert.Null(value.GetValue());
+            Assert.False(await value.NextRowAsync());
+            Assert.Null(await value.GetValueAsync());
         }
 
         [Fact]
-        public void SingleReportValueWithNull()
+        public async void SingleReportValueWithNull()
         {
             var value = new SingleReportSource();
 
-            Assert.Null(value.GetValue());
+            Assert.Null(await value.GetValueAsync());
 
-            Assert.True(value.NextRow());
-            Assert.True(value.NextColumn());
+            Assert.True(await value.NextRowAsync());
+            Assert.True(await value.NextColumnAsync());
 
-            Assert.Null(value.GetValue());
+            Assert.Null(await value.GetValueAsync());
 
-            Assert.False(value.NextColumn());
-            Assert.Null(value.GetValue());
+            Assert.False(await value.NextColumnAsync());
+            Assert.Null(await value.GetValueAsync());
 
-            Assert.False(value.NextRow());
-            Assert.Null(value.GetValue());
+            Assert.False(await value.NextRowAsync());
+            Assert.Null(await value.GetValueAsync());
         }
 
         [Fact]
-        public void EnumerableReportValue()
+        public async void EnumerableReportValue()
         {
             var value = new EnumerableReportSource();
 
@@ -55,36 +55,36 @@ namespace BlackDigital.Report.Tests.Sources
                 new[] { "Hello2", "World2" }
             });
 
-            Assert.Null(value.GetValue());
+            Assert.Null(await value.GetValueAsync());
 
-            Assert.True(value.NextRow());
-            Assert.True(value.NextColumn());
+            Assert.True(await value.NextRowAsync());
+            Assert.True(await value.NextColumnAsync());
 
-            Assert.Equal("Hello", value.GetValue());
+            Assert.Equal("Hello", await value.GetValueAsync());
 
-            Assert.True(value.NextColumn());
-            Assert.Equal("World", value.GetValue());
+            Assert.True(await value.NextColumnAsync());
+            Assert.Equal("World", await value.GetValueAsync());
 
-            Assert.False(value.NextColumn());
-            Assert.Null(value.GetValue());
+            Assert.False(await value.NextColumnAsync());
+            Assert.Null(await value.GetValueAsync());
 
-            Assert.True(value.NextRow());
-            Assert.Null(value.GetValue());
+            Assert.True(await value.NextRowAsync());
+            Assert.Null(await value.GetValueAsync());
 
-            Assert.True(value.NextColumn());
-            Assert.Equal("Hello2", value.GetValue());
+            Assert.True(await value.NextColumnAsync());
+            Assert.Equal("Hello2", await value.GetValueAsync());
 
-            Assert.True(value.NextColumn());
-            Assert.Equal("World2", value.GetValue());
+            Assert.True(await value.NextColumnAsync());
+            Assert.Equal("World2", await value.GetValueAsync());
 
-            Assert.False(value.NextColumn());
-            Assert.False(value.NextRow());
+            Assert.False(await value.NextColumnAsync());
+            Assert.False(await value.NextRowAsync());
 
-            Assert.Null(value.GetValue());
+            Assert.Null(await value.GetValueAsync());
         }
 
         [Fact]
-        public void ModelReportSource()
+        public async void ModelReportSource()
         {
             var value = new ModelReportSource<SimpleModel>();
 
@@ -94,36 +94,36 @@ namespace BlackDigital.Report.Tests.Sources
                 new SimpleModel("World", 2)
             });
 
-            Assert.Null(value.GetValue());
+            Assert.Null(await value.GetValueAsync());
 
-            Assert.True(value.NextRow());
-            Assert.True(value.NextColumn());
+            Assert.True(await value.NextRowAsync());
+            Assert.True(await value.NextColumnAsync());
 
-            Assert.Equal("Hello", value.GetValue());
+            Assert.Equal("Hello", await value.GetValueAsync());
 
-            Assert.True(value.NextColumn());
-            Assert.Equal(1d, value.GetValue());
+            Assert.True(await value.NextColumnAsync());
+            Assert.Equal(1d, await value.GetValueAsync());
 
-            Assert.False(value.NextColumn());
-            Assert.Null(value.GetValue());
+            Assert.False(await value.NextColumnAsync());
+            Assert.Null(await value.GetValueAsync());
 
-            Assert.True(value.NextRow());
-            Assert.Null(value.GetValue());
+            Assert.True(await value.NextRowAsync());
+            Assert.Null(await value.GetValueAsync());
 
-            Assert.True(value.NextColumn());
-            Assert.Equal("World", value.GetValue());
+            Assert.True(await value.NextColumnAsync());
+            Assert.Equal("World", await value.GetValueAsync());
 
-            Assert.True(value.NextColumn());
-            Assert.Equal(2d, value.GetValue());
+            Assert.True(await value.NextColumnAsync());
+            Assert.Equal(2d, await value.GetValueAsync());
 
-            Assert.False(value.NextColumn());
-            Assert.False(value.NextRow());
+            Assert.False(await value.NextColumnAsync());
+            Assert.False(await value.NextRowAsync());
 
-            Assert.Null(value.GetValue());
+            Assert.Null(await value.GetValueAsync());
         }
 
         [Fact]
-        public void ListReportSource()
+        public async void ListReportSource()
         {
             var list = new List<object>
             {
@@ -133,20 +133,20 @@ namespace BlackDigital.Report.Tests.Sources
 
             var value = new ListReportSource(list);
 
-            Assert.Null(value.GetValue());
+            Assert.Null(await value.GetValueAsync());
 
-            Assert.True(value.NextRow());
-            Assert.True(value.NextColumn());
+            Assert.True(await value.NextRowAsync());
+            Assert.True(await value.NextColumnAsync());
 
-            Assert.Equal("Hello", value.GetValue());
+            Assert.Equal("Hello", await value.GetValueAsync());
 
-            Assert.True(value.NextColumn());
-            Assert.Equal("World", value.GetValue());
+            Assert.True(await value.NextColumnAsync());
+            Assert.Equal("World", await value.GetValueAsync());
 
-            Assert.False(value.NextColumn());
-            Assert.False(value.NextRow());
+            Assert.False(await value.NextColumnAsync());
+            Assert.False(await value.NextRowAsync());
 
-            Assert.Null(value.GetValue());
+            Assert.Null(await value.GetValueAsync());
         }
     }
 }

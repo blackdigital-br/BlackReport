@@ -7,7 +7,7 @@ namespace BlackDigital.Report.Tests.Spreadsheet
     public class TableBuilderTest
     {
         [Fact]
-        public void GenerateTable()
+        public async void GenerateTable()
         {
             var spreadsheet = new WorkbookBuilder(new ReportConfiguration());
             var sheet = spreadsheet.AddSheet("Sheet1");
@@ -28,18 +28,18 @@ namespace BlackDigital.Report.Tests.Spreadsheet
             table.AddHeader(header);
             table.AddBody(body);
 
-            header.MoveToEnd();
-            body.MoveToEnd();
+            await header.MoveToEndAsync();
+            await body.MoveToEndAsync();
 
-            table.Generate();
+            await table.GenerateAsync();
 
-            Assert.Contains("xl/tables/table1.xml", spreadsheet.Files.Keys);
+            Assert.Contains(spreadsheet.Files, f => f.Filename == "/xl/tables/table1.xml");
 
-            using MemoryStream msTable = new(spreadsheet.Files["xl/tables/table1.xml"]);
+            using MemoryStream msTable = new(spreadsheet.Files.First(f => f.Filename == "/xl/tables/table1.xml").Content);
             using StreamReader srTable = new(msTable);
             var tableXml = srTable.ReadToEnd();
 
-            var expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><x:table xmlns:x=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" id=\"1\" name=\"Table1\" displayName=\"Table1\" ref=\"A1:B3\" totalsRowShown=\"0\"><x:autoFilter ref=\"A1:B3\" /><x:tableColumns count=\"2\"><x:tableColumn id=\"1\" name=\"Header1\" /><x:tableColumn id=\"2\" name=\"Header2\" /></x:tableColumns><x:tableStyleInfo name=\"TableStyleMedium15\" showFirstColumn=\"0\" showLastColumn=\"0\" showRowStripes=\"1\" showColumnStripes=\"0\" /></x:table>";
+            var expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><table xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" id=\"1\" name=\"Table1\" displayName=\"Table1\" ref=\"A1:B3\" totalsRowShown=\"0\"><autoFilter ref=\"A1:B3\" /><tableColumns count=\"2\"><tableColumn id=\"1\" name=\"Header1\" /><tableColumn id=\"2\" name=\"Header2\" /></tableColumns><tableStyleInfo name=\"TableStyleMedium15\" showFirstColumn=\"0\" showLastColumn=\"0\" showRowStripes=\"1\" showColumnStripes=\"0\" /></table>";
             Assert.Equal(expected, tableXml);
         }
     }
