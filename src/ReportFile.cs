@@ -3,14 +3,14 @@ namespace BlackDigital.Report
 {
     public class ReportFile
     {
-        public ReportFile(string uri, string contentType, byte[] content)
+        public ReportFile(string filename, string contentType, byte[] content)
         {
-            Uri = uri;
+            Filename = filename;
             ContentType = contentType;
             Content = content;
         }
 
-        public string Uri { get; set; }
+        public string Filename { get; set; }
 
         public string ContentType { get; set; }
 

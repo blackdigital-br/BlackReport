@@ -164,7 +164,7 @@ namespace BlackDigital.Report.Spreadsheet
 
             foreach (var file in Files)
             {
-                var part = package.CreatePart(new Uri(file.Uri, UriKind.Relative), file.ContentType);
+                var part = package.CreatePart(new Uri(file.Filename, UriKind.Relative), file.ContentType);
                 await part.GetStream().WriteAsync(file.Content, 0, file.Content.Length);
             }
 
@@ -201,15 +201,15 @@ namespace BlackDigital.Report.Spreadsheet
             writer.Write("<Properties xmlns=\"http://schemas.openxmlformats.org/officeDocument/2006/extended-properties\">");
 
             if (!string.IsNullOrWhiteSpace(Application))
-                writer.Write($"<Application>{Application}</Application>");
+                writer.Write($"<Application>{SpreadsheetHelper.Normalize(Application)}</Application>");
 
             if (!string.IsNullOrWhiteSpace(Manager))
-                writer.Write($"<Manager>{Manager}</Manager>");
+                writer.Write($"<Manager>{SpreadsheetHelper.Normalize(Manager)}</Manager>");
 
             if (!string.IsNullOrWhiteSpace(AppVersion))
-                writer.WriteLine($"<AppVersion>{AppVersion}</AppVersion>");
+                writer.WriteLine($"<AppVersion>{SpreadsheetHelper.Normalize(AppVersion)}</AppVersion>");
 
-            writer.Write($"<Company>{Company}</Company>");
+            writer.Write($"<Company>{SpreadsheetHelper.Normalize(Company ?? string.Empty)}</Company>");
             writer.Write("</Properties>");
 
             writer.Flush();
@@ -239,22 +239,22 @@ namespace BlackDigital.Report.Spreadsheet
             writer.Write("<cp:coreProperties xmlns:cp=\"http://schemas.openxmlformats.org/package/2006/metadata/core-properties\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\">");
 
             if (!string.IsNullOrWhiteSpace(Title))
-                writer.Write($"<dc:title>{Title}</dc:title>");
+                writer.Write($"<dc:title>{SpreadsheetHelper.Normalize(Title)}</dc:title>");
 
             if (!string.IsNullOrWhiteSpace(Subject))
-                writer.Write($"<dc:subject>{Subject}</dc:subject>");
+                writer.Write($"<dc:subject>{SpreadsheetHelper.Normalize(Subject)}</dc:subject>");
 
             if (Creators.Any())
-                writer.Write($"<dc:creator>{string.Join(";", Creators)}</dc:creator>");
+                writer.Write($"<dc:creator>{SpreadsheetHelper.Normalize(string.Join(";", Creators))}</dc:creator>");
 
             if (Keywords.Any())
-                writer.Write($"<cp:keywords>{string.Join(";", Keywords)}</cp:keywords>");
+                writer.Write($"<cp:keywords>{SpreadsheetHelper.Normalize(string.Join(";", Keywords))}</cp:keywords>");
 
             if (!string.IsNullOrWhiteSpace(Description))
-                writer.Write($"<dc:description>{Description}</dc:description>");
+                writer.Write($"<dc:description>{SpreadsheetHelper.Normalize(Description)}</dc:description>");
 
             if (!string.IsNullOrWhiteSpace(Category))
-                writer.Write($"<cp:category>{Category}</cp:category>");
+                writer.Write($"<cp:category>{SpreadsheetHelper.Normalize(Category)}</cp:category>");
 
             writer.Write("</cp:coreProperties>");
 

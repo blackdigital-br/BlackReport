@@ -12,7 +12,8 @@ Currently it is only generating reports in spreadsheets.
     ReportGenerator.Spreadsheet()
                    .AddSheet("First")
                    .AddTable("Data")
-                   .FillObject(list)
+                   .AddHeader(new List<string>() { "Name", "Number", "ObjDate", "Time" })
+                   .AddBody(list)
                    .BuildAsync(@"test.xlsx");
 ```
 
@@ -83,7 +84,8 @@ dotnet add package BlackDigital.Report
     ReportGenerator.Spreadsheet()
                    .AddSheet("First")
                    .AddTable("Data")
-                   .FillObject(list)
+                   .AddHeader(new List<string>() { "Name", "Number", "ObjDate", "Time" })
+                   .AddBody(list)
                    .BuildAsync(@"test.xlsx");
 ```
 
@@ -122,7 +124,7 @@ dotnet add package BlackDigital.Report
                    .AddSheet("Second")
                    .AddTable("Data2", "B3")
                    .AddHeader(headers)
-                   .Fill(list) 
+                   .AddBody(list) 
                    .BuildAsync(@"test.xlsx");
 ```
 
@@ -158,7 +160,7 @@ dotnet add package BlackDigital.Report
 
     byte[] buffer = await ReportGenerator.Spreadsheet()
                             ...
-                            .BuildAsync(); //Return as byte array
+                            .BuildAsync(); //Return as ReportFile class with byte array, content type and file name
     
 ```
 
@@ -166,19 +168,30 @@ dotnet add package BlackDigital.Report
 
 https://github.com/blackdigital-br/BlackReport/tree/main/src/BlackDigital.Report.Example
 
+## Update code from 0.2.x to 0.5.0
+
+A new way of adding data has been implemented. This format allows for the generation of large reports by streaming directly from the database or using asynchronous IEnumerables. It is now possible to create new source classes. For the time being, the methods 'FillObject' and 'Fill' have been replaced by 'AddValue' within the sheet scope, or 'AddHeader'/'AddBody' within the table scope. Additional methods will be added in the future.
+
+The return type of BuildAsync has also changed. Instead of returning just a byte array, it now returns the ReportFile class, which includes the byte array data, Content Type, and a file name.
+
 ## Roadmap
 
     ☑️ Excel Tables. (0.1.0)
     ☑️ Fill from instance class. (0.1.0)
     ☑️ Multiple tables in the same worksheet. (0.1.1)
     ☑️ .NET5 (0.1.2)
-	☑️ Header Globalization. (0.1.2)
+    ☑️ Remove OpenXML reference. (0.5.0)
+    ☑️ Data Sources (Single object, class instance list, struct object list, two-dimensional array, DataTable and DbDataReader). (0.5.0)
+    ☑️ Excel Shared String. (0.5.0)
+    ☑️ Unit test. (0.5.0)
+    ☑️ Injection configurations. (0.5.0)
+    ☑️ Spreadsheet cell configurations. (0.5.0)
+    ☑️ ReportFile class as build return. (0.5.0)
+    ◼️ Header Globalization. (removed on refactory 0.5.0)
     ◼️ Use DisplayAttribute to get name of columns and properties that should be generated.
-    ◼️ Excel Shared String.
     ◼️ Cells with formulas.
     ◼️ Cell value event.
     ◼️ Tables footers.
-    ◼️ Unit test.
     ◼️ Olders .net versions.
     ◼️ Others types (Word, csv...).
     ◼️ Your suggestion.
