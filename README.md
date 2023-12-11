@@ -187,6 +187,7 @@ The return type of BuildAsync has also changed. Instead of returning just a byte
     ☑️ Injection configurations. (0.5.0)
     ☑️ Spreadsheet cell configurations. (0.5.0)
     ☑️ ReportFile class as build return. (0.5.0)
+    ☑️ .NET7 and .NET8 support (0.5.0)
     ◼️ Header Globalization. (removed on refactory 0.5.0)
     ◼️ Use DisplayAttribute to get name of columns and properties that should be generated.
     ◼️ Cells with formulas.
