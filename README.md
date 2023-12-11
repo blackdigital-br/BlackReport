@@ -1,6 +1,6 @@
 # BlackDigital Report
 
-Simple report generator using OpenXML.
+Efficient and standalone report generator.
 
 Currently it is only generating reports in spreadsheets.
 
