@@ -1,13 +1,14 @@
-﻿
+﻿using System.Threading.Tasks;
+
 namespace BlackDigital.Report.Sources
 {
     public static class SourceHelper
     {
-        public static void MoveToEnd(this ReportSource source)
+        public static async Task MoveToEndAsync(this ReportSource source)
         {
-            while (source.NextRow())
+            while (await source.NextRowAsync())
             {
-                while (source.NextColumn()) { }
+                while (await source.NextColumnAsync()) { }
             }
         }
     }

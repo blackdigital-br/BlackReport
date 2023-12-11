@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 
 namespace BlackDigital.Report.Sources
@@ -35,10 +36,7 @@ namespace BlackDigital.Report.Sources
 
         public override bool IsSourceType(Type type, object? data)
         {
-            return (
-                data is string
-                || type.IsValueType
-                )
+            return (data is string || type.IsValueType)
                 && data != null;
         }
 
@@ -53,56 +51,57 @@ namespace BlackDigital.Report.Sources
             Value = data;
         }
 
-        public override bool NextRow()
+        public override Task<bool> NextRowAsync()
         {
             if (!RowProcessed)
             {
                 RowProcessed = true;
                 _rowCount++;
-                return true;
+                return Task.FromResult(true);
             }
             else
             {
                 Processed = true;
-                return false;
+                return Task.FromResult(false);
             }
         }
 
-        public override bool NextColumn()
+        public override Task<bool> NextColumnAsync()
         {
             if (!ColumnProcessed)
             {
                 ColumnProcessed = true;
                 _columnCount++;
-                return true;
+                return Task.FromResult(true);
             }
             else
             {
                 Processed = true;
-                return false;
+                return Task.FromResult(false);
             }
         }
 
-        public override object? GetValue()
+        public override Task<object?> GetValueAsync()
         {
 
             if (!Processed
                 && RowProcessed
                 && ColumnProcessed)
             {
-                return Value;
+                return Task.FromResult(Value);
             }
             else
             {
-                return null;
+                return Task.FromResult<object?>(null);
             }
         }
 
-        public override void Reset()
+        public override Task ResetAsync()
         {
             Processed = false;
             RowProcessed = false;
             ColumnProcessed = false;
+            return Task.CompletedTask;
         }
 
         #endregion "ReportSource"

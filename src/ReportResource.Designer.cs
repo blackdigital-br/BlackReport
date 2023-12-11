@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace BlackDigital.Report.Spreadsheet {
+namespace BlackDigital.Report {
     using System;
     
     
@@ -22,14 +22,14 @@ namespace BlackDigital.Report.Spreadsheet {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class SpreadsheetResource {
+    internal class ReportResource {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal SpreadsheetResource() {
+        internal ReportResource() {
         }
         
         /// <summary>
@@ -39,7 +39,7 @@ namespace BlackDigital.Report.Spreadsheet {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("BlackDigital.Report.Spreadsheet.SpreadsheetResource", typeof(SpreadsheetResource).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("BlackDigital.Report.ReportResource", typeof(ReportResource).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,6 +61,78 @@ namespace BlackDigital.Report.Spreadsheet {
         }
         
         /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a application/vnd.openxmlformats-package.core-properties+xml.
+        /// </summary>
+        internal static string ContentType_OpenXML_Core {
+            get {
+                return ResourceManager.GetString("ContentType_OpenXML_Core", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a application/vnd.openxmlformats-officedocument.extended-properties+xml.
+        /// </summary>
+        internal static string ContentType_OpenXML_Properties {
+            get {
+                return ResourceManager.GetString("ContentType_OpenXML_Properties", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a application/vnd.openxmlformats-package.relationships+xml.
+        /// </summary>
+        internal static string ContentType_OpenXML_Relationships {
+            get {
+                return ResourceManager.GetString("ContentType_OpenXML_Relationships", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.
+        /// </summary>
+        internal static string ContentType_Spreadsheet {
+            get {
+                return ResourceManager.GetString("ContentType_Spreadsheet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml.
+        /// </summary>
+        internal static string ContentType_Spreadsheet_Main {
+            get {
+                return ResourceManager.GetString("ContentType_Spreadsheet_Main", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a application/vnd.openxmlformats-officedocument.spreadsheetml.sharedStrings+xml.
+        /// </summary>
+        internal static string ContentType_Spreadsheet_SharedStrings {
+            get {
+                return ResourceManager.GetString("ContentType_Spreadsheet_SharedStrings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml.
+        /// </summary>
+        internal static string ContentType_Spreadsheet_Sheet {
+            get {
+                return ResourceManager.GetString("ContentType_Spreadsheet_Sheet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml.
+        /// </summary>
+        internal static string ContentType_Spreadsheet_Styles {
+            get {
+                return ResourceManager.GetString("ContentType_Spreadsheet_Styles", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Consulta uma cadeia de caracteres localizada semelhante a &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
         ///&lt;x:styleSheet xmlns:x=&quot;http://schemas.openxmlformats.org/spreadsheetml/2006/main&quot;&gt;
         ///   &lt;x:numFmts count=&quot;3&quot;&gt;
@@ -72,9 +144,9 @@ namespace BlackDigital.Report.Spreadsheet {
         ///      &lt;x:font&gt;
         ///         &lt;x:sz v [o restante da cadeia de caracteres foi truncado]&quot;;.
         /// </summary>
-        internal static string Styles {
+        internal static string Spreadsheet_Styles {
             get {
-                return ResourceManager.GetString("Styles", resourceCulture);
+                return ResourceManager.GetString("Spreadsheet_Styles", resourceCulture);
             }
         }
     }

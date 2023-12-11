@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace BlackDigital.Report
 {
@@ -18,12 +19,12 @@ namespace BlackDigital.Report
         
         public abstract void Load(object data);
 
-        public abstract bool NextRow();
+        public abstract Task<bool> NextRowAsync();
 
-        public abstract bool NextColumn();
+        public abstract Task<bool> NextColumnAsync();
 
-        public abstract object? GetValue();
+        public abstract Task<object?> GetValueAsync();
 
-        public abstract void Reset();
+        public abstract Task ResetAsync();
     }
 }

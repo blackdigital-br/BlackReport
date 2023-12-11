@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace BlackDigital.Report.Sources
 {
@@ -55,10 +56,10 @@ namespace BlackDigital.Report.Sources
             RowEnumarator.Reset();
         }
 
-        public override bool NextRow()
+        public override Task<bool> NextRowAsync()
         {
             if (RowEnumarator == null)
-                throw new System.Exception("ReportSource is not loaded");
+                throw new Exception("ReportSource is not loaded");
 
             if (RowEnumarator.MoveNext())
             {
@@ -67,20 +68,20 @@ namespace BlackDigital.Report.Sources
                 ColumnEnumarator = CurrentRow.GetEnumerator();
                 ColumnEnumarator.Reset();
                 Row = true;
-                return true;
+                return Task.FromResult(true);
             }
             else
             {
                 Row = false;
                 Processed = true;
-                return false;
+                return Task.FromResult(false);
             }
         }
 
-        public override bool NextColumn()
+        public override Task<bool> NextColumnAsync()
         {
             if (ColumnEnumarator == null)
-                throw new System.Exception("ReportSource is not loaded");
+                throw new Exception("ReportSource is not loaded");
 
             Column = ColumnEnumarator.MoveNext();
 
@@ -89,30 +90,31 @@ namespace BlackDigital.Report.Sources
             else
                 _columnCounted = true;
 
-            return Column;
+            return Task.FromResult(Column);
         }
 
-        public override object? GetValue()
+        public override Task<object?> GetValueAsync()
         {
             if (Data == null)
-                throw new System.Exception("ReportSource is not loaded");
+                throw new Exception("ReportSource is not loaded");
 
             if (!Processed && Column && Row)
             {
-                return ColumnEnumarator?.Current;
+                return Task.FromResult(ColumnEnumarator?.Current);
             }
             else
             {
-                return null;
+                return Task.FromResult<object?>(null);
             }
         }
 
-        public override void Reset()
+        public override Task ResetAsync()
         {
             RowEnumarator?.Reset();
             ColumnEnumarator?.Reset();
             Row = false;
             Column = false;
+            return Task.CompletedTask;
         }
 
         #endregion "ReportSource"

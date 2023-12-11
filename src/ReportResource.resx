@@ -117,7 +117,31 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Styles" xml:space="preserve">
+  <data name="ContentType_OpenXML_Core" xml:space="preserve">
+    <value>application/vnd.openxmlformats-package.core-properties+xml</value>
+  </data>
+  <data name="ContentType_OpenXML_Properties" xml:space="preserve">
+    <value>application/vnd.openxmlformats-officedocument.extended-properties+xml</value>
+  </data>
+  <data name="ContentType_OpenXML_Relationships" xml:space="preserve">
+    <value>application/vnd.openxmlformats-package.relationships+xml</value>
+  </data>
+  <data name="ContentType_Spreadsheet" xml:space="preserve">
+    <value>application/vnd.openxmlformats-officedocument.spreadsheetml.sheet</value>
+  </data>
+  <data name="ContentType_Spreadsheet_Main" xml:space="preserve">
+    <value>application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml</value>
+  </data>
+  <data name="ContentType_Spreadsheet_SharedStrings" xml:space="preserve">
+    <value>application/vnd.openxmlformats-officedocument.spreadsheetml.sharedStrings+xml</value>
+  </data>
+  <data name="ContentType_Spreadsheet_Sheet" xml:space="preserve">
+    <value>application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml</value>
+  </data>
+  <data name="ContentType_Spreadsheet_Styles" xml:space="preserve">
+    <value>application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml</value>
+  </data>
+  <data name="Spreadsheet_Styles" xml:space="preserve">
     <value>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
 &lt;x:styleSheet xmlns:x="http://schemas.openxmlformats.org/spreadsheetml/2006/main"&gt;
    &lt;x:numFmts count="3"&gt;

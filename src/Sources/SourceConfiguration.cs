@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
+using System.Linq;
 
 namespace BlackDigital.Report.Sources
 {
@@ -18,8 +20,8 @@ namespace BlackDigital.Report.Sources
             SourcesTypes.Add(typeof(DataReaderReportSource));
             SourcesTypes.Add(typeof(DataTableReportSource));
             SourcesTypes.Add(typeof(EnumerableReportSource));
-            SourcesTypes.Add(typeof(ListReportSource));
             SourcesTypes.Add(typeof(ModelReportSource<>));
+            SourcesTypes.Add(typeof(ListReportSource));
             SourcesTypes.Add(typeof(SingleReportSource));
         }
 
@@ -55,7 +57,13 @@ namespace BlackDigital.Report.Sources
             {
                 object? sourceObject;
 
-                if (sourceType.IsGenericTypeDefinition)
+                if (sourceType.IsGenericTypeDefinition
+                    && type.IsGenericType
+                    && type.GenericTypeArguments.Length == 1
+                    && type.GenericTypeArguments.First().IsClass
+                    && type.GenericTypeArguments.First() != typeof(string))
+                    sourceObject = Activator.CreateInstance(sourceType.MakeGenericType(type.GenericTypeArguments));
+                else if (sourceType.IsGenericTypeDefinition)
                     sourceObject = Activator.CreateInstance(sourceType.MakeGenericType(type));
                 else
                     sourceObject = Activator.CreateInstance(sourceType);

@@ -92,7 +92,7 @@ namespace BlackDigital.Report.Spreadsheet
 
         #region "Generator"
 
-        public void Generate()
+        public async Task GenerateAsync()
         {
             using MemoryStream tableMemoryStream = new();
             using StreamWriter writer = new(tableMemoryStream);
@@ -102,26 +102,27 @@ namespace BlackDigital.Report.Spreadsheet
             finalPosition = finalPosition.AddColumn(Body.ColumnCount - 1);
 
             string tableRef = $"{Position}:{finalPosition}";
+            var id = WorkbookBuilder.Tables.IndexOf(this) + 1;
 
             writer.Write($"<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-            writer.Write($"<x:table xmlns:x=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" ");
-            writer.Write($"id=\"1\" name=\"{TableName}\" displayName=\"{TableName}\" ");
+            writer.Write($"<table xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" ");
+            writer.Write($"id=\"{id}\" name=\"{TableName}\" displayName=\"{TableName}\" ");
             writer.Write($"ref=\"{tableRef}\" totalsRowShown=\"0\">");
-            writer.Write($"<x:autoFilter ref=\"{tableRef}\" />");
-            writer.Write($"<x:tableColumns count=\"{Header.ColumnCount}\">");
+            writer.Write($"<autoFilter ref=\"{tableRef}\" />");
+            writer.Write($"<tableColumns count=\"{Header.ColumnCount}\">");
 
-            Header.Reset();
-            Header.NextRow();
+            await Header.ResetAsync();
+            await Header.NextRowAsync();
 
             for (int i = 1; i <= Header.ColumnCount; i++)
             {
-                Header.NextColumn();
-                writer.Write($"<x:tableColumn id=\"{i}\" name=\"{Header.GetValue()}\" />");
+                await Header.NextColumnAsync();
+                writer.Write($"<tableColumn id=\"{i}\" name=\"{await Header.GetValueAsync()}\" />");
             }
 
-            writer.Write($"</x:tableColumns>");
-            writer.Write($"<x:tableStyleInfo name=\"TableStyleMedium15\" showFirstColumn=\"0\" showLastColumn=\"0\" showRowStripes=\"1\" showColumnStripes=\"0\" />");
-            writer.Write("</x:table>");
+            writer.Write($"</tableColumns>");
+            writer.Write($"<tableStyleInfo name=\"TableStyleMedium15\" showFirstColumn=\"0\" showLastColumn=\"0\" showRowStripes=\"1\" showColumnStripes=\"0\" />");
+            writer.Write("</table>");
 
             writer.Flush();
 

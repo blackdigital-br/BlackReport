@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace BlackDigital.Report.Spreadsheet.Formatter
 {
@@ -14,11 +15,14 @@ namespace BlackDigital.Report.Spreadsheet.Formatter
             else
                 throw new InvalidOperationException("Invalid value type");
 
+            double totalSeconds = realValue.TotalSeconds / 86400;
+            string stringValue = Convert.ToString(totalSeconds, CultureInfo.InvariantCulture);
+
             return new()
             {
                 Position = position,
                 Type = CellType.Number,
-                Value = (realValue.TotalSeconds / 86400).ToString(),
+                Value = stringValue,
                 Style = (int)SpreadsheetFormat.TimeSpan
             };
         }

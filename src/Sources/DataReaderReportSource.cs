@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Runtime.Versioning;
+using System.Threading.Tasks;
 
 namespace BlackDigital.Report.Sources
 {
@@ -49,12 +50,12 @@ namespace BlackDigital.Report.Sources
             Reader = (DbDataReader)data;
         }
 
-        public override bool NextRow()
+        public override async Task<bool> NextRowAsync()
         {
             if (Reader == null)
                 throw new Exception("ReportSource is not loaded");
 
-            Row = Reader.Read();
+            Row = await Reader.ReadAsync();
             Columns = Reader.FieldCount;
             Column = 0;
 
@@ -65,13 +66,13 @@ namespace BlackDigital.Report.Sources
             else
             {
                 Processed = true;
-                Reader.Close();
+                await Reader.CloseAsync();
             }
 
             return Row;
         }
 
-        public override bool NextColumn()
+        public override Task<bool> NextColumnAsync()
         {
             if (Reader == null)
                 throw new Exception("ReportSource is not loaded");
@@ -79,15 +80,15 @@ namespace BlackDigital.Report.Sources
             if (Column < Columns)
             {
                 Column++;
-                return true;
+                return Task.FromResult(true);
             }
             else
             {
-                return false;
+                return Task.FromResult(false);
             }
         }
 
-        public override object? GetValue()
+        public override Task<object?> GetValueAsync()
         {
             if (Reader == null)
                 throw new Exception("ReportSource is not loaded");
@@ -96,15 +97,15 @@ namespace BlackDigital.Report.Sources
                 && Row
                 && Column <= Columns)
             {
-                return Reader.GetValue(Column - 1);
+                return Task.FromResult<object?>(Reader.GetValue(Column - 1));
             }
             else
             {
-                return null;
+                return Task.FromResult<object?>(null);
             }
         }
 
-        public override void Reset()
+        public override Task ResetAsync()
         {
             throw new Exception("DataReaderReportSource cannot be reset");
         }

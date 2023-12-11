@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 
 namespace BlackDigital.Report.Sources
@@ -50,44 +51,45 @@ namespace BlackDigital.Report.Sources
             Data = ((IEnumerable)data).Cast<object>();
         }
 
-        public override bool NextRow()
+        public override Task<bool> NextRowAsync()
         {
             if (!RowProcessed)
             {
                 RowProcessed = true;
                 ColumnPosition = -1;
-                return true;
+                return Task.FromResult(true);
             }
             else
-                return false;
+                return Task.FromResult(false);
         }
 
-        public override bool NextColumn()
+        public override Task<bool> NextColumnAsync()
         {
             ColumnPosition++;
 
             if (ColumnPosition < Data!.Count())
-                return true;
+                return Task.FromResult(true);
             else
-                return false;
+                return Task.FromResult(false);
         }
 
-        public override object? GetValue()
+        public override Task<object?> GetValueAsync()
         {
             if (!Processed
                 && RowProcessed
                 && ColumnPosition >= 0
                 && ColumnPosition < Data!.Count())
-                return Data!.ElementAt(ColumnPosition);
+                return Task.FromResult<object?>(Data!.ElementAt(ColumnPosition));
             else
-                return null;
+                return Task.FromResult<object?>(null);
         }
 
-        public override void Reset()
+        public override Task ResetAsync()
         {
             Processed = false;
             RowProcessed = false;
             ColumnPosition = -1;
+            return Task.CompletedTask;
         }
 
         #endregion "ReportSource"

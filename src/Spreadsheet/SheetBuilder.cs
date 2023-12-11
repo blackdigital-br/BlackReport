@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using BlackDigital.Report.Spreadsheet.Formatter;
 
 namespace BlackDigital.Report.Spreadsheet
 {
@@ -104,9 +105,9 @@ namespace BlackDigital.Report.Spreadsheet
         /// Generate sheets files
         /// </summary>
         /// <param name="configuration"></param>
-        public void Generate()
+        public async Task GenerateAsync()
         {
-            GenerateSheet();
+            await GenerateSheetAsync();
             GenerateSheetRels();
         }
 
@@ -114,7 +115,7 @@ namespace BlackDigital.Report.Spreadsheet
         /// Create a sheet.xml file
         /// </summary>
         /// <param name="configuration"></param>
-        private void GenerateSheet()
+        private async Task GenerateSheetAsync()
         {
             using MemoryStream sheetMemoryStream = new();
             using StreamWriter writer = new(sheetMemoryStream);
@@ -122,7 +123,7 @@ namespace BlackDigital.Report.Spreadsheet
             writer.Write($"<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
             writer.Write($"<worksheet xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\">");
             writer.Write($"<sheetData>");
-            WriteSheet(writer);
+            await WriteSheetAsync(writer);
             writer.Write($"</sheetData>");
             WriteTableParts(writer);
             writer.Write($"</worksheet>");
@@ -132,7 +133,7 @@ namespace BlackDigital.Report.Spreadsheet
             var filename = $"/xl/worksheets/{WorkbookBuilder.GetSheetId(this)}.xml";
 
             ReportFile file = new(filename,
-                                    "application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml",
+                                    ReportResource.ContentType_Spreadsheet_Sheet,
                                     sheetMemoryStream.ToArray());
 
             WorkbookBuilder.Files.Add(file);
@@ -162,7 +163,7 @@ namespace BlackDigital.Report.Spreadsheet
             var filename = $"/xl/worksheets/_rels/{WorkbookBuilder.GetSheetId(this)}.xml.rels";
 
             ReportFile file = new(filename,
-                                    "application/vnd.openxmlformats-package.relationships+xml",
+                                    ReportResource.ContentType_OpenXML_Relationships,
                                     sheetMemoryStream.ToArray());
 
             WorkbookBuilder.Files.Add(file);
@@ -172,7 +173,7 @@ namespace BlackDigital.Report.Spreadsheet
         /// Find sources to write
         /// </summary>
         /// <param name="writer"></param>
-        private void WriteSheet(StreamWriter writer)
+        private async Task WriteSheetAsync(StreamWriter writer)
         {
             var sourceOrdened = Values.OrderBy(source => source.Key.Row)
                                       .ThenBy(x => x.Key.Column)
@@ -188,15 +189,14 @@ namespace BlackDigital.Report.Spreadsheet
                 {
                     if (position.Row >= source.Key.Row)
                     {
-                        if (source.Value.NextRow())
+                        if (await source.Value.NextRowAsync())
                             sources.Add(source.Key, source.Value);
                         else
                             sourceOrdened.Remove(source.Key);
                     }
                 }
 
-                WriteRow(writer, sources, ref position);
-
+                position = await WriteRowAsync(writer, sources, position);
                 position = new(1, position.Row + 1);
             }
         }
@@ -207,12 +207,12 @@ namespace BlackDigital.Report.Spreadsheet
         /// <param name="writer"></param>
         /// <param name="sources"></param>
         /// <param name="position"></param>
-        private void WriteRow(StreamWriter writer, 
+        private async Task<SheetPosition> WriteRowAsync(StreamWriter writer, 
                               Dictionary<SheetPosition, ReportSource> sources,
-                              ref SheetPosition position)
+                              SheetPosition position)
         {
             if (!sources.Any())
-                return;
+                return position;
 
             writer.Write($"<row r=\"{position.Row}\">");
 
@@ -224,20 +224,22 @@ namespace BlackDigital.Report.Spreadsheet
                 {
                     if (position.Column >= source.Key.Column)
                     {
-                        if (source.Value.NextColumn())
+                        if (await source.Value.NextColumnAsync())
                             columnSources.Add(source.Key, source.Value);
                         else
                             sources.Remove(source.Key);
                     }
                 }
 
-                WriteColumn(writer, columnSources, ref position);
+                position = await WriteColumnAsync(writer, columnSources, position);
                 position = position.AddColumn();
             }
             
 
             writer.Write("</row>");
             writer.Flush();
+
+            return position;
         }
 
         /// <summary>
@@ -246,18 +248,28 @@ namespace BlackDigital.Report.Spreadsheet
         /// <param name="writer"></param>
         /// <param name="sources"></param>
         /// <param name="position"></param>
-        private void WriteColumn(StreamWriter writer,
+        private async Task<SheetPosition> WriteColumnAsync(StreamWriter writer,
                                  Dictionary<SheetPosition, ReportSource> sources,
-                                 ref SheetPosition position)
+                                 SheetPosition position)
         {
             if (!sources.Any())
-                return;
+                return position;
                 
-            writer.Write($"<c r=\"{position}\" t=\"str\">");
-            writer.Write($"<v>");
-            writer.Write(sources.First().Value.GetValue());
-            writer.Write($"</v>");
-            writer.Write("</c>");
+            var value = await sources.First().Value.GetValueAsync();
+            var createCellValue = Configuration.Spreadsheet.GetCreaterCellValue(value?.GetType());
+
+            if (createCellValue is null)
+                return position;
+
+            var valueCell = createCellValue.Create(position, value, WorkbookBuilder.SharedStrings);
+
+            string style = valueCell.Style.HasValue ? $" s=\"{valueCell.Style.Value}\"" : string.Empty;
+            string finalValue = SpreadsheetHelper.Normalize(valueCell.Value.ToString());
+
+            writer.Write($"<c r=\"{valueCell.Position}\"{style} t=\"{valueCell.Type.ToCellTypeString()}\">");
+            writer.Write($"<v>{finalValue}</v></c>");
+
+            return position;
         }
 
         /// <summary>

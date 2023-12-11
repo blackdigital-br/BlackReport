@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Reflection;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace BlackDigital.Report.Sources
 {
@@ -43,8 +44,12 @@ namespace BlackDigital.Report.Sources
         #region "ReportSource"
 
         public override bool IsSourceType(Type type, object? data)
-            => data is IEnumerable<T>;
-
+        {
+            return data is IEnumerable<T>
+                && type.IsClass
+                && type != typeof(string);
+        }
+            
         public override void Load(object data)
         {
             if (data == null)
@@ -61,7 +66,7 @@ namespace BlackDigital.Report.Sources
             RowEnumarator.Reset();
         }
 
-        public override bool NextRow()
+        public override Task<bool> NextRowAsync()
         {
             if (RowEnumarator == null
                 || Properties == null)
@@ -74,17 +79,17 @@ namespace BlackDigital.Report.Sources
                 ColumnEnumarator = Properties.GetEnumerator();
                 ColumnEnumarator.Reset();
                 Row = true;
-                return true;
+                return Task.FromResult(true);
             }
             else
             {
                 Row = false;
                 Processed = true;
-                return false;
+                return Task.FromResult(false);
             }
         }
 
-        public override bool NextColumn()
+        public override Task<bool> NextColumnAsync()
         {
             if (ColumnEnumarator == null)
                 throw new System.Exception("ReportSource is not loaded");
@@ -96,10 +101,10 @@ namespace BlackDigital.Report.Sources
             else
                 columnCounted = true;
 
-            return Column;
+            return Task.FromResult(Column);
         }
 
-        public override object? GetValue()
+        public override Task<object?> GetValueAsync()
         {
             if (ModelList == null)
                 throw new System.Exception("ReportSource is not loaded");
@@ -107,23 +112,24 @@ namespace BlackDigital.Report.Sources
             if (!Processed && Column && Row)
             {
                 if (CurrentModel == null)
-                    return null;
+                    return Task.FromResult<object?>(null);
 
-                return ColumnEnumarator?.Current.GetValue(CurrentModel);
+                return Task.FromResult(ColumnEnumarator?.Current.GetValue(CurrentModel));
             }
             else
             {
-                return null;
+                return Task.FromResult<object?>(null);
             }
         }
 
-        public override void Reset()
+        public override Task ResetAsync()
         {
             RowEnumarator?.Reset();
             ColumnEnumarator?.Reset();
             Row = false;
             Column = false;
             Processed = false;
+            return Task.CompletedTask;
         }
 
         #endregion "ReportSource"

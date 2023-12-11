@@ -5,6 +5,13 @@ namespace BlackDigital.Report.Spreadsheet.Formatter
 {
     public class StringCreaterCellValue : ICreaterCellValue
     {
+        public StringCreaterCellValue(SpreadsheetConfiguration configuration)
+        {
+            Configuration = configuration;
+        }
+
+        private SpreadsheetConfiguration Configuration { get; }
+
         public CellValue Create(SheetPosition position, object? value, HashSet<string>? sharedStrings = null)
         {
             int? ssPosition = null;
@@ -16,7 +23,10 @@ namespace BlackDigital.Report.Spreadsheet.Formatter
             if (ssPosition == null
                 && sharedStrings != null
                 && value != null
-                && !value.ToString().Contains('\n'))
+                //&& !value.ToString().Contains('\n')
+                && (Configuration.SharedStringsSize.HasValue
+                    && Configuration.SharedStringsSize.Value > 0
+                    && value.ToString().Length <= Configuration.SharedStringsSize.Value))
             {
                 sharedStrings.Add(value.ToString());
                 ssPosition = sharedStrings.Count - 1;

@@ -3,11 +3,11 @@
 	<PropertyGroup>
 		<TargetFrameworks>net8.0;net7.0;net6.0;net5.0</TargetFrameworks>
 		<Nullable>enable</Nullable>
-		<AssemblyVersion>0.2.2</AssemblyVersion>
-		<FileVersion>0.2.2</FileVersion>
+		<AssemblyVersion>0.5.0</AssemblyVersion>
+		<FileVersion>0.5.0</FileVersion>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-		<Version>$(VersionPrefix)0.2.2</Version>
+		<Version>$(VersionPrefix)0.5.0</Version>
 		<Description>Simple report generator using OpenXML. Currently it is only generating reports in spreadsheets.</Description>
 		<PackageProjectUrl>https://github.com/blackdigital-br/BlackReport</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/blackdigital-br/BlackReport</RepositoryUrl>
@@ -43,6 +43,23 @@
 
 	<ItemGroup>
 	  <PackageReference Include="System.IO.Packaging" Version="8.0.0" />
+	</ItemGroup>
+
+
+	<ItemGroup>
+	  <Compile Update="ReportResource.Designer.cs">
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	    <DependentUpon>ReportResource.resx</DependentUpon>
+	  </Compile>
+	</ItemGroup>
+
+
+	<ItemGroup>
+	  <EmbeddedResource Update="ReportResource.resx">
+	    <Generator>ResXFileCodeGenerator</Generator>
+	    <LastGenOutput>ReportResource.Designer.cs</LastGenOutput>
+	  </EmbeddedResource>
 	</ItemGroup>
 	
 </Project>
