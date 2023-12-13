@@ -84,8 +84,7 @@ dotnet add package BlackDigital.Report
     ReportGenerator.Spreadsheet()
                    .AddSheet("First")
                    .AddTable("Data")
-                   .AddHeader(new List<string>() { "Name", "Number", "ObjDate", "Time" })
-                   .AddBody(list)
+                   .Fill(list)
                    .BuildAsync(@"test.xlsx");
 ```
 
@@ -188,8 +187,8 @@ The return type of BuildAsync has also changed. Instead of returning just a byte
     ☑️ Spreadsheet cell configurations. (0.5.0)
     ☑️ ReportFile class as build return. (0.5.0)
     ☑️ .NET7 and .NET8 support (0.5.0)
-    ◼️ Header Globalization. (removed on refactory 0.5.0)
-    ◼️ Use DisplayAttribute to get name of columns and properties that should be generated.
+    ☑️ Header Globalization. (0.5.1)
+    ☑️ Use DisplayAttribute to get name of columns and properties that should be generated. (0.5.1)
     ◼️ Cells with formulas.
     ◼️ Cell value event.
     ◼️ Tables footers.

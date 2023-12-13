@@ -4,15 +4,14 @@ using System.Resources;
 using System.Reflection;
 using System.Globalization;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using BlackDigital.Report.Sources;
-
+using System.ComponentModel.DataAnnotations;
 
 namespace BlackDigital.Report
 {
     internal static class ReportHelper
     {
-        internal static EnumerableReportSource GetObjectHeader<T>(ResourceManager? resource, CultureInfo? culture)
+        internal static ReportSource GetObjectHeader<T>(ResourceManager? resource, CultureInfo? culture)
         {
             var properties = GetPropertiesAndAttributes<T>();
             var header = properties.Select(p =>
@@ -28,18 +27,15 @@ namespace BlackDigital.Report
                 }
 
                 return columnName;
-            }).AsEnumerable();
+            }).ToList();
 
-            List<IEnumerable<string>> headerDataset = new();
-            headerDataset.Add(header);
-
-            var source = new EnumerableReportSource();
-            source.Load(headerDataset);
+            var source = new ListReportSource();
+            source.Load(header);
 
             return source;
         }
         
-        internal static List<List<object>> ObjectToData<T>(IEnumerable<T> data)
+        internal static ReportSource ObjectToData<T>(IEnumerable<T> data)
         {
             var list = new List<List<object>>();
             
@@ -57,8 +53,10 @@ namespace BlackDigital.Report
                 list.Add(dataRow);
             }
 
+            var source = new EnumerableReportSource();
+            source.Load(list);
 
-            return list;
+            return source;
         }
 
         internal static List<Tuple<PropertyInfo, DisplayAttribute?>> GetPropertiesAndAttributes<T>()

@@ -21,6 +21,7 @@ List<TestModel> list = new();
 list.Add(new("Line <1> \r\n &A", 10, DateTime.Today, TimeSpan.FromHours(3), DateOnly.FromDateTime(DateTime.Today), new(3, 0)));
 list.Add(new("Line <2> \r\n &B", -10, DateTime.Now, TimeSpan.FromMinutes(12), DateOnly.FromDateTime(DateTime.Today), new(5, 30)));
 list.Add(new("Line <3> \n\r &C", 10.6d, DateTime.UtcNow, TimeSpan.FromMinutes(45).Add(TimeSpan.FromSeconds(31)), DateOnly.FromDateTime(DateTime.Today), new(17, 45)));
+list.Add(new(null, 10.6d, DateTime.UtcNow, TimeSpan.FromMinutes(45).Add(TimeSpan.FromSeconds(31)), DateOnly.FromDateTime(DateTime.Today), new(17, 45)));
 
 List<string> headers = new()
 {
@@ -73,7 +74,8 @@ System.ComponentModel.DataAnnotations.DisplayAttribute a;
 //System.Text.Json.Serialization.JsonStringEnumConverter
 //string a;
 
-var task = ReportGenerator.Spreadsheet()
+/*var task = ReportGenerator.Spreadsheet()
+
                 .SetCompany("BlackDigital")
                 .SetApplication("BlackDigital Report")
                 .SetManager("TioRAC Lab")
@@ -106,16 +108,16 @@ var task = ReportGenerator.Spreadsheet()
 
 task.Wait();
 
-return;
+return;*/
 
-/*task = ReportGenerator.Spreadsheet()
+var task = ReportGenerator.Spreadsheet()
                 .SetCompany("BlackDigital")
                 .SetResourceManager(Texts.ResourceManager)
                 .SetFormatProvider(new CultureInfo("pt"))
                 .AddSheet("First")
                 .AddTable("Data")
-                .FillObject(list)
-                .Spreadsheet()
+                .Fill(list)
+                /*.Spreadsheet()
                 .AddSheet("Second")
                 .AddValue("My text header")
                 .AddTable("Data2", "B3")
@@ -123,7 +125,7 @@ return;
                 .Fill(list2)
                 .Sheet()
                 .AddTable("Data3", "g4")
-                .FillObject(list)
-                .BuildAsync("test-pt.xlsx");*/
+                .FillObject(list)*/
+                .BuildAsync("D:\\Teste\\temp\\test-default.xlsx");
 
 task.Wait();

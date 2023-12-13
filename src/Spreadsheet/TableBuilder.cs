@@ -1,5 +1,7 @@
 ﻿using System.IO;
+using System.Globalization;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace BlackDigital.Report.Spreadsheet
 {
@@ -73,6 +75,17 @@ namespace BlackDigital.Report.Spreadsheet
         public TableBuilder AddHeader<T>(T data)
             => AddHeader(Configuration.Sources.FindSource(data));
 
+        public TableBuilder AddHeader<T>()
+        {
+            var resource = WorkbookBuilder.Resource;
+            CultureInfo? culture = null;
+
+            if (WorkbookBuilder.FormatProvider is CultureInfo)
+                culture = (CultureInfo)WorkbookBuilder.FormatProvider;
+
+            return AddHeader(ReportHelper.GetObjectHeader<T>(resource, culture));
+        }
+
         public TableBuilder AddBody(ReportSource source)
         {
             if (HasData)
@@ -87,6 +100,20 @@ namespace BlackDigital.Report.Spreadsheet
 
         public TableBuilder AddBody<T>(T data)
             => AddBody(Configuration.Sources.FindSource(data));
+
+        public TableBuilder Fill<T>(IEnumerable<T> data)
+        {
+            var resource = WorkbookBuilder.Resource;
+            CultureInfo? culture = null;
+                
+            if (WorkbookBuilder.FormatProvider is CultureInfo)
+                culture = (CultureInfo)WorkbookBuilder.FormatProvider;
+
+            AddHeader(ReportHelper.GetObjectHeader<T>(resource, culture));
+            AddBody(ReportHelper.ObjectToData(data));
+
+            return this;
+        }
 
         #endregion "Builder"
 
