@@ -83,7 +83,9 @@ namespace BlackDigital.Report.Spreadsheet
 
         public ICreaterCellValue GetCreaterCellValue(Type type)
         {
-            if (CreaterValues.ContainsKey(type))
+            if (CreaterValues != null
+                && type != null
+                && CreaterValues.ContainsKey(type))
                 return CreaterValues[type];
 
             return new StringCreaterCellValue(this);
