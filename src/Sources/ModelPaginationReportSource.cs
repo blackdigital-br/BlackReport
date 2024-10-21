@@ -173,7 +173,9 @@ namespace BlackDigital.Report.Sources
 
             _columnPosition++;
 
-            if (_columnPosition >= (Properties?.Count() ?? 0))
+            var properties = ReportHelper.GetPropertiesAndAttributes<T>();
+
+            if (_columnPosition >= (properties?.Count() ?? 0))
                 return Task.FromResult(false);
 
             int columnSize = _columnPosition + 1;
